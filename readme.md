@@ -6,6 +6,12 @@ App that allows to fing songs in specified guitar tuning.
 
 UI: https://daisyui.com/
 
+## Data parser
+
+To run parser locally:
+Run dev server: `yarn dev:functions`
+Follow URL: http://localhost:8888/.netlify/functions/parser
+
 ## Misc
 
 Songsterr API :
