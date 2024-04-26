@@ -1,9 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { getSongs as getSongsRequest } from "@/api/songsterrApi";
 
 export default function Home() {
   const [tuning, setTuning] = useState<string[]>([]);
+
+  const getSongs = async () => {
+    const songs = await getSongsRequest();
+    console.log("songs", songs);
+  };
 
   return (
     <div>
@@ -38,7 +44,9 @@ export default function Home() {
           />
         </div>
       ))}
-      <button className="btn btn-primary">Search songs with tuning</button>
+      <button className="btn btn-primary" onClick={getSongs}>
+        Search songs with tuning
+      </button>
     </div>
   );
 }

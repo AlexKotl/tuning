@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const parameters = {
   size: 500,
-  from: 0,
+  from: 5 * 500,
   inst: "guitar",
   difficulty: "0",
 };
@@ -28,38 +28,48 @@ const handler = async (req: Request, context: Context) => {
   const response = await fetch(apiUrl);
   const songsResponse = await response.json();
 
-  const songsList = songsResponse.map((song: any) => {
-    const track = song.tracks.sort((a: any, b: any) => a.views > b.views)[0];
-    return {
-      songId: song.songId,
-      instrumentId: track.instrumentId,
-      artist: song.artist,
-      title: song.title,
-      views: track.views,
-      string1TuningId: track.tuning?.[0],
-      string2TuningId: track.tuning?.[1],
-      string3TuningId: track.tuning?.[2],
-      string4TuningId: track.tuning?.[3],
-      string5TuningId: track.tuning?.[4],
-      string6TuningId: track.tuning?.[5],
-      string7TuningId: track.tuning?.[6],
-    };
-  });
+  const pasedSongIds = songsResponse.map((song: any) => song.songId);
 
-  const songIds = songsResponse.map((song: any) => song.songId);
+  const { data, error } = await supabase
+    .from("songs")
+    .select("songId")
+    .in("songId", pasedSongIds);
 
-  const { data, error } = await supabase.from("parser_logs").select("*").
-  await supabase.from("parser_logs").insert([
-    {
-      sizeParam: parameters.size,
-      fromParam: parameters.from,
-      instParam: parameters.inst,
-      difficultyParam: parameters.difficulty,
-    },
-  ]);
+  const existedIds = data?.map((song) => song.songId);
 
-  //   const { data, error } = await supabase.from("songs").insert(songsList);
-  //   console.log(data, error);
+  const songsList = songsResponse
+    .filter((song: any) => !existedIds?.includes(song.songId))
+    .map((song: any) => {
+      const track = song.tracks.sort((a: any, b: any) => a.views > b.views)[0];
+      return {
+        songId: song.songId,
+        instrumentId: track.instrumentId,
+        artist: song.artist,
+        title: song.title,
+        views: track.views,
+        string1TuningId: track.tuning?.[0],
+        string2TuningId: track.tuning?.[1],
+        string3TuningId: track.tuning?.[2],
+        string4TuningId: track.tuning?.[3],
+        string5TuningId: track.tuning?.[4],
+        string6TuningId: track.tuning?.[5],
+        string7TuningId: track.tuning?.[6],
+      };
+    });
+
+  // TODO: Implement storing or updating parser info
+  // const { data, error } = await supabase.from("parser_logs").select("*").
+  // await supabase.from("parser_logs").insert([
+  //   {
+  //     sizeParam: parameters.size,
+  //     fromParam: parameters.from,
+  //     instParam: parameters.inst,
+  //     difficultyParam: parameters.difficulty,
+  //   },
+  // ]);
+
+  await supabase.from("songs").insert(songsList);
+  console.log(data, error);
   return new Response("Parsing finished!");
 };
 
