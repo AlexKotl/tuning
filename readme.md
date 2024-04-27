@@ -6,6 +6,10 @@ App that allows to fing songs in specified guitar tuning.
 
 UI: https://daisyui.com/
 
+## Dev
+
+init Supabase cli: `supabase login`
+
 ## Data parser
 
 To run parser locally:

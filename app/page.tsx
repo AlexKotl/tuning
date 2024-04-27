@@ -1,20 +1,20 @@
 "use client";
 
 import { useState } from "react";
-// import { getSongs as getSongsRequest } from "@/api/songsterrApi";
 import { createClient } from "@supabase/supabase-js";
 import { stringToNoteId } from "@/utils/utils";
+import type { Database, Tables } from "@/supabase/database";
 
 export default function Home() {
   const [tuning, setTuning] = useState<string[]>([]);
-  const [songs, setSongs] = useState([]);
+  const [songs, setSongs] = useState<Tables<"songs">[]>([]);
 
-  const supabase = createClient(
+  const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
     process.env.NEXT_PUBLIC_SUPABASE_KEY ?? ""
   );
 
-  const getSongs = async () => {
+  const fetchSongs = async () => {
     const { data, error } = await supabase
       .from("songs")
       .select()
@@ -61,11 +61,11 @@ export default function Home() {
           />
         </div>
       ))}
-      <button className="btn btn-primary" onClick={getSongs}>
+      <button className="btn btn-primary" onClick={fetchSongs}>
         Search songs with tuning
       </button>
       {songs?.map((song) => (
-        <div>{song.title}</div>
+        <div key={song.id}>{song.title}</div>
       ))}
     </div>
   );
