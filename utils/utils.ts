@@ -19,3 +19,7 @@ export function stringToNoteId(note: string, stringNo: number): number {
   }
   return 0;
 }
+
+export function getSongExternalUrl(sonsterrSongId: number) {
+  return `https://www.songsterr.com/a/wsa/SONG-tab-s${sonsterrSongId}`;
+}

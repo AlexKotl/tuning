@@ -16,7 +16,7 @@ const supabase = createClient(
 const apiUrl =
   "https://www.songsterr.com/api/songs?" +
   Object.keys(parameters)
-    .map((key) => `${key}=${parameters[key]}`)
+    .map((key) => `${key}=${parameters[key as keyof typeof parameters]}`)
     .join("&");
 
 const handler = async (req: Request, context: Context) => {

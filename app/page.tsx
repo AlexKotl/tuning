@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { stringToNoteId } from "@/utils/utils";
+import { getSongExternalUrl, stringToNoteId } from "@/utils/utils";
 import type { Database, Tables } from "@/supabase/database";
 
 export default function Home() {
@@ -63,7 +63,7 @@ export default function Home() {
             type="text"
             value={tuning[index] ?? ""}
             placeholder={`String ${index + 1}`}
-            className="input w-full max-w-xs"
+            className="input w-full max-w-xs input-bordered my-1"
             maxLength={2}
             minLength={1}
           />
@@ -77,9 +77,15 @@ export default function Home() {
         {isLoading && <span className="loading loading-spinner"></span>}
         Search songs with tuning
       </button>
-      {songs?.map((song) => (
-        <div key={song.id}>{song.title}</div>
-      ))}
+      <ul className="menu bg-base-200 w-100 rounded-box">
+        {songs?.map((song) => (
+          <li key={song.id}>
+            <a href={getSongExternalUrl(song.songId)}>
+              {song.artist}: <strong>{song.title}</strong>
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

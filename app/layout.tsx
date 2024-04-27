@@ -14,10 +14,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="container mx-auto">
-      <main>
-        {children}
+        <main>
+          <h1>Tuning Geek</h1>
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body p-10">{children}</div>
+          </div>
         </main>
-        </body>
+      </body>
     </html>
   );
 }
