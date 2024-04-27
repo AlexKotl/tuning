@@ -8,6 +8,7 @@ import type { Database, Tables } from "@/supabase/database";
 export default function Home() {
   const [tuning, setTuning] = useState<string[]>([]);
   const [songs, setSongs] = useState<Tables<"songs">[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
@@ -15,17 +16,24 @@ export default function Home() {
   );
 
   const fetchSongs = async () => {
+    setIsLoading(true);
     const { data, error } = await supabase
       .from("songs")
       .select()
-      .eq("string1TuningId", stringToNoteId(tuning[0]))
-      .eq("string2TuningId", stringToNoteId(tuning[1]))
-      .eq("string3TuningId", stringToNoteId(tuning[2]))
-      .eq("string4TuningId", stringToNoteId(tuning[3]))
-      .eq("string5TuningId", stringToNoteId(tuning[4]))
-      .eq("string6TuningId", stringToNoteId(tuning[5]));
+      .eq("string1TuningId", stringToNoteId(tuning[0], 0))
+      .eq("string2TuningId", stringToNoteId(tuning[1], 1))
+      .eq("string3TuningId", stringToNoteId(tuning[2], 2))
+      .eq("string4TuningId", stringToNoteId(tuning[3], 3))
+      .eq("string5TuningId", stringToNoteId(tuning[4], 4))
+      .eq("string6TuningId", stringToNoteId(tuning[5], 5));
 
-    setSongs((data as any).slice(0, 20));
+    if (error) {
+      console.error(error);
+    }
+    setSongs(data?.slice(0, 20) ?? []);
+    setIsLoading(false);
+
+    // TODO: Implement search by  close tunings
   };
 
   return (
@@ -33,19 +41,19 @@ export default function Home() {
       Quick picks:
       <button
         className="btn btn-neutral mx-1"
-        onClick={() => setTuning(["E", "A", "D", "G", "B", "E"])}
+        onClick={() => setTuning(["E", "B", "G", "D", "A", "E"])}
       >
         Standard: EADGBE
       </button>
       <button
         className="btn btn-neutral mx-1"
-        onClick={() => setTuning(["D", "A", "D", "F#", "A", "D"])}
+        onClick={() => setTuning(["D", "A", "F#", "D", "A", "D"])}
       >
         Drop D: DADF#AD
       </button>
       <button
         className="btn btn-neutral mx-1"
-        onClick={() => setTuning(["D", "A", "D", "G", "A", "D"])}
+        onClick={() => setTuning(["D", "A", "G", "D", "A", "D"])}
       >
         DADGAD
       </button>
@@ -61,7 +69,12 @@ export default function Home() {
           />
         </div>
       ))}
-      <button className="btn btn-primary" onClick={fetchSongs}>
+      <button
+        className="btn btn-primary"
+        onClick={fetchSongs}
+        disabled={isLoading}
+      >
+        {isLoading && <span className="loading loading-spinner"></span>}
         Search songs with tuning
       </button>
       {songs?.map((song) => (
