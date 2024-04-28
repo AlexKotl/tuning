@@ -11,8 +11,8 @@ export default function About() {
         songs with your current tuning?
       </p>
       <p>
-        Here you can select ANY 6-string tuning and find popular songs that are
-        played in this tuning.
+        Here you can select <strong>any</strong> 6-string tuning and find
+        popular songs that are played in the same tuning.
       </p>
     </div>
   );

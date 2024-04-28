@@ -5,6 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 import { getSongExternalUrl, stringToNoteId } from "@/utils/utils";
 import type { Database, Tables } from "@/supabase/database";
 import { tuningVariants } from "@/config/constants";
+import About from "./about";
 
 export default function Home() {
   const [tuning, setTuning] = useState<string[]>([]);
@@ -39,17 +40,17 @@ export default function Home() {
   };
 
   return (
-    <div className="flex gap-5">
+    <div className="flex gap-5 flex-col md:flex-row">
       <div className="flex-1">
         <div className="card bg-base-100 shadow-xl ">
           <div className="card-body p-10">
             <div>
-              Quick picks: <br></br>
+              Quick picks: <br />
               {tuningVariants.map((tuning, index) => (
                 <a
                   role="button"
                   key={index}
-                  className="btn mx-1"
+                  className="btn mx-1 my-1"
                   onClick={() => setTuning(tuning.tuning)}
                 >
                   <div className="flex flex-col items-start">
@@ -65,18 +66,21 @@ export default function Home() {
                 </a>
               ))}
             </div>
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index}>
-                <input
-                  type="text"
-                  value={tuning[index] ?? ""}
-                  placeholder={`String ${index + 1}`}
-                  className="input w-full max-w-xs input-bordered my-1"
-                  maxLength={2}
-                  minLength={1}
-                />
-              </div>
-            ))}
+            <div className="my-5 flex gap-2">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index}>
+                  <input
+                    type="text"
+                    value={tuning[index] ?? ""}
+                    placeholder="Tune"
+                    className="input w-full max-w-xs input-bordered my-1"
+                    maxLength={2}
+                    minLength={1}
+                  />
+                  <div className=" text-xs">String {6 - index}</div>
+                </div>
+              ))}
+            </div>
             <button
               className="btn btn-primary"
               onClick={fetchSongs}
@@ -85,6 +89,12 @@ export default function Home() {
               {isLoading && <span className="loading loading-spinner"></span>}
               Search songs with tuning
             </button>
+          </div>
+        </div>
+
+        <div className="card bg-base-100 shadow-xl my-5">
+          <div className="card-body">
+            <About />
           </div>
         </div>
       </div>

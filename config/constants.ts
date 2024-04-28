@@ -13,7 +13,19 @@ export const tuningVariants: TuningVariant[] = [
     tuning: ["D", "A", "F#", "D", "A", "D"],
   },
   {
-    title: "",
+    title: "Celtic",
     tuning: ["D", "A", "G", "D", "A", "D"],
+  },
+  {
+    title: "Open C Tuning",
+    tuning: ["D", "B", "G", "D", "G", "D"],
+  },
+  {
+    title: "Open G Tuning",
+    tuning: ["E", "C", "G", "C", "G", "C"],
+  },
+  {
+    title: "Double Drop D Tuning",
+    tuning: ["D", "A", "D", "G", "B", "D"],
   },
 ];
