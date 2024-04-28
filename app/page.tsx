@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { getSongExternalUrl, stringToNoteId } from "@/utils/utils";
 import type { Database, Tables } from "@/supabase/database";
+import { tuningVariants } from "@/config/constants";
 
 export default function Home() {
   const [tuning, setTuning] = useState<string[]>([]);
@@ -30,6 +31,7 @@ export default function Home() {
     if (error) {
       console.error(error);
     }
+    // TODO: Implement show more feature insted of slicing
     setSongs(data?.slice(0, 20) ?? []);
     setIsLoading(false);
 
@@ -37,57 +39,68 @@ export default function Home() {
   };
 
   return (
-    <div>
-      Quick picks:
-      <button
-        className="btn btn-neutral mx-1"
-        onClick={() => setTuning(["E", "B", "G", "D", "A", "E"])}
-      >
-        <strong>Standard </strong>
-        <small>EADGBE</small>
-      </button>
-      <button
-        className="btn btn-neutral mx-1"
-        onClick={() => setTuning(["D", "A", "F#", "D", "A", "D"])}
-      >
-        Drop D: DADF#AD
-      </button>
-      <button
-        className="btn btn-neutral mx-1"
-        onClick={() => setTuning(["D", "A", "G", "D", "A", "D"])}
-      >
-        DADGAD
-      </button>
-      {Array.from({ length: 6 }).map((_, index) => (
-        <div key={index}>
-          <input
-            type="text"
-            value={tuning[index] ?? ""}
-            placeholder={`String ${index + 1}`}
-            className="input w-full max-w-xs input-bordered my-1"
-            maxLength={2}
-            minLength={1}
-          />
+    <div className="flex gap-5">
+      <div className="flex-1">
+        <div className="card bg-base-100 shadow-xl ">
+          <div className="card-body p-10">
+            <div>
+              Quick picks: <br></br>
+              {tuningVariants.map((tuning, index) => (
+                <a
+                  role="button"
+                  key={index}
+                  className="btn mx-1"
+                  onClick={() => setTuning(tuning.tuning)}
+                >
+                  <div className="flex flex-col items-start">
+                    {tuning.title && (
+                      <div className="text-base-content/50 text-xs">
+                        {tuning.title}
+                      </div>
+                    )}
+                    <div>
+                      <strong>{tuning.tuning.reverse().join("")}</strong>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index}>
+                <input
+                  type="text"
+                  value={tuning[index] ?? ""}
+                  placeholder={`String ${index + 1}`}
+                  className="input w-full max-w-xs input-bordered my-1"
+                  maxLength={2}
+                  minLength={1}
+                />
+              </div>
+            ))}
+            <button
+              className="btn btn-primary"
+              onClick={fetchSongs}
+              disabled={isLoading}
+            >
+              {isLoading && <span className="loading loading-spinner"></span>}
+              Search songs with tuning
+            </button>
+          </div>
         </div>
-      ))}
-      <button
-        className="btn btn-primary"
-        onClick={fetchSongs}
-        disabled={isLoading}
-      >
-        {isLoading && <span className="loading loading-spinner"></span>}
-        Search songs with tuning
-      </button>
-      <ul className="menu bg-base-200 w-100 rounded-box">
-        {songs?.map((song) => (
-          <li key={song.id}>
-            <a href={getSongExternalUrl(song.songId)} target="_blank">
-              {song.artist}:<strong>{song.title}</strong>{" "}
-              <small>{song.views} views</small>
-            </a>
-          </li>
-        ))}
-      </ul>
+      </div>
+
+      <div className="flex-1">
+        <ul className="menu bg-base-200 w-100 rounded-box">
+          {songs?.map((song) => (
+            <li key={song.id}>
+              <a href={getSongExternalUrl(song.songId)} target="_blank">
+                {song.artist}:<strong>{song.title}</strong>{" "}
+                <small>{song.views} views</small>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

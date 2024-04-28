@@ -12,5 +12,4 @@ module.exports = {
     themes: ["garden"],
   },
   plugins: [require("daisyui")],
-}
-
+};

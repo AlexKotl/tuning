@@ -15,10 +15,8 @@ export default function RootLayout({
     <html lang="en">
       <body className="container mx-auto">
         <main>
-          <h1>Tuning Geek</h1>
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body p-10">{children}</div>
-          </div>
+          <h1 className="text-lg">Tuning Geek</h1>
+          {children}
         </main>
       </body>
     </html>
