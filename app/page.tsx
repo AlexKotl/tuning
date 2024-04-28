@@ -43,7 +43,8 @@ export default function Home() {
         className="btn btn-neutral mx-1"
         onClick={() => setTuning(["E", "B", "G", "D", "A", "E"])}
       >
-        Standard: EADGBE
+        <strong>Standard </strong>
+        <small>EADGBE</small>
       </button>
       <button
         className="btn btn-neutral mx-1"
@@ -80,8 +81,9 @@ export default function Home() {
       <ul className="menu bg-base-200 w-100 rounded-box">
         {songs?.map((song) => (
           <li key={song.id}>
-            <a href={getSongExternalUrl(song.songId)}>
-              {song.artist}: <strong>{song.title}</strong>
+            <a href={getSongExternalUrl(song.songId)} target="_blank">
+              {song.artist}:<strong>{song.title}</strong>{" "}
+              <small>{song.views} views</small>
             </a>
           </li>
         ))}
