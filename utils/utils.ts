@@ -13,7 +13,6 @@ export function stringToNoteId(note: string, stringNo: number): number {
   for (let i = 0; i < 10; i++) {
     const variant = NOTES.indexOf(note) + FIRST_NOTE_OFFSET + i * 12;
     if (Math.abs(variant - closestNumber) <= 6) {
-      console.log(note, "=", variant);
       return variant;
     }
   }

@@ -10,6 +10,7 @@ import About from "./about";
 export default function Home() {
   const [tuning, setTuning] = useState<string[]>([]);
   const [songs, setSongs] = useState<Tables<"songs">[]>([]);
+  const [additionalSongs, setAdditionalSongs] = useState<Tables<"songs">[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const supabase = createClient<Database>(
@@ -19,6 +20,9 @@ export default function Home() {
 
   const fetchSongs = async () => {
     setIsLoading(true);
+    setSongs([]);
+    setAdditionalSongs([]);
+
     const { data, error } = await supabase
       .from("songs")
       .select()
@@ -32,11 +36,37 @@ export default function Home() {
     if (error) {
       console.error(error);
     }
+
     // TODO: Implement show more feature insted of slicing
     setSongs(data?.slice(0, 20) ?? []);
-    setIsLoading(false);
 
-    // TODO: Implement search by  close tunings
+    if (data?.length && data?.length < 20) {
+      let additional: any = [];
+      for (let string = 1; string <= 6; string++) {
+        const matchCondition: any = {};
+        Array.from({ length: 6 }).map((_, index) => {
+          if (index + 1 !== string) {
+            matchCondition[`string${index + 1}TuningId`] = stringToNoteId(
+              tuning[index],
+              index
+            );
+          }
+        });
+
+        const { data: dataAdditional } = await supabase
+          .from("songs")
+          .select()
+          .match(matchCondition)
+          .neq(
+            `string${string}TuningId`,
+            stringToNoteId(tuning[string - 1], string - 1)
+          );
+        additional = [...additional, ...(dataAdditional ?? [])];
+      }
+      setAdditionalSongs(additional);
+    }
+
+    setIsLoading(false);
   };
 
   return (
@@ -101,7 +131,17 @@ export default function Home() {
 
       <div className="flex-1">
         <ul className="menu bg-base-200 w-100 rounded-box">
+          <li className="menu-title">Songs with this tuning:</li>
           {songs?.map((song) => (
+            <li key={song.id}>
+              <a href={getSongExternalUrl(song.songId)} target="_blank">
+                {song.artist}:<strong>{song.title}</strong>{" "}
+                <small>{song.views} views</small>
+              </a>
+            </li>
+          ))}
+          <li className="menu-title">Tuning that differs only by 1 string</li>
+          {additionalSongs?.map((song) => (
             <li key={song.id}>
               <a href={getSongExternalUrl(song.songId)} target="_blank">
                 {song.artist}:<strong>{song.title}</strong>{" "}
