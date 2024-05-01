@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { getSongExternalUrl, stringToNoteId } from "@/utils/utils";
 import type { Database, Tables } from "@/supabase/database";
@@ -69,6 +69,14 @@ export default function Home() {
     setIsLoading(false);
   };
 
+  const handleTuningInputChange =
+    (index: number) => (event: ChangeEvent<HTMLInputElement>) => {
+      const newTuning = tuning;
+      newTuning[index] = (event.target as HTMLInputElement).value;
+      console.log("setting", newTuning);
+      setTuning([...newTuning]);
+    };
+
   return (
     <div className="flex gap-5 flex-col md:flex-row">
       <div className="flex-1">
@@ -76,21 +84,23 @@ export default function Home() {
           <div className="card-body p-10">
             <div>
               Quick picks: <br />
-              {tuningVariants.map((tuning, index) => (
+              {tuningVariants.map((tuningVariant, index) => (
                 <a
                   role="button"
                   key={index}
                   className="btn mx-1 my-1"
-                  onClick={() => setTuning(tuning.tuning)}
+                  onClick={() => setTuning(tuningVariant.tuning)}
                 >
                   <div className="flex flex-col items-start">
-                    {tuning.title && (
+                    {tuningVariant.title && (
                       <div className="text-base-content/50 text-xs">
-                        {tuning.title}
+                        {tuningVariant.title}
                       </div>
                     )}
                     <div>
-                      <strong>{tuning.tuning.reverse().join("")}</strong>
+                      <strong>
+                        {[...tuningVariant.tuning].reverse().join("")}
+                      </strong>
                     </div>
                   </div>
                 </a>
@@ -102,6 +112,7 @@ export default function Home() {
                   <input
                     type="text"
                     value={tuning[index] ?? ""}
+                    onChange={handleTuningInputChange(index)}
                     placeholder="Tune"
                     className="input w-full max-w-xs input-bordered my-1"
                     maxLength={2}
