@@ -2,7 +2,11 @@
 
 import { useState, ChangeEvent } from "react";
 import { createClient } from "@supabase/supabase-js";
-import { getSongExternalUrl, stringToNoteId } from "@/utils/utils";
+import {
+  getSongExternalUrl,
+  stringToNoteId,
+  getSongTuningString,
+} from "@/utils/utils";
 import type { Database, Tables } from "@/supabase/database";
 import { tuningVariants } from "@/config/constants";
 import About from "./about";
@@ -155,8 +159,8 @@ export default function Home() {
           {additionalSongs?.map((song) => (
             <li key={song.id}>
               <a href={getSongExternalUrl(song.songId)} target="_blank">
-                {song.artist}:<strong>{song.title}</strong>{" "}
-                <small>{song.views} views</small>
+                {song.artist}:<strong>{song.title}</strong> (
+                {getSongTuningString(song)})<small>{song.views} views</small>
               </a>
             </li>
           ))}
