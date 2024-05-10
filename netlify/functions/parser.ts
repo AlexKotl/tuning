@@ -1,27 +1,43 @@
 import type { Context } from "@netlify/functions";
 import { createClient } from "@supabase/supabase-js";
 
-const parameters = {
-  size: 500,
-  from: 5 * 500,
-  inst: "guitar",
-  difficulty: "0",
+type ApiRequestParameters = {
+  size: number;
+  from: number;
+  inst?: string;
+  difficulty?: string;
 };
 
+const MAX_RESULT_ITEMS = 10_000;
+const ITEMS_PER_REQUEST = 500;
+
 const supabase = createClient(
-  process.env.SUPABASE_URL ?? "",
+  process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
   process.env.SUPABASE_SERVICE_KEY ?? ""
 );
 
-const apiUrl =
-  "https://www.songsterr.com/api/songs?" +
-  Object.keys(parameters)
-    .map((key) => `${key}=${parameters[key as keyof typeof parameters]}`)
-    .join("&");
+async function parseWithParams(parameters: ApiRequestParameters) {
+  const apiUrl =
+    "https://www.songsterr.com/api/songs?" +
+    Object.keys(parameters)
+      .map((key) => `${key}=${parameters[key as keyof typeof parameters]}`)
+      .join("&");
 
-const handler = async (req: Request, context: Context) => {
-  if (!process.env.SUPABASE_URL) {
-    throw new Error("SUPABASE_URL not defined");
+  const currentQueryParams = {
+    sizeParam: parameters.size,
+    fromParam: parameters.from,
+    instParam: parameters.inst,
+    difficultyParam: parameters.difficulty,
+  };
+
+  // Check if we already parsed this
+  const { data: dataParser } = await supabase
+    .from("parser_logs")
+    .select("*")
+    .match(currentQueryParams);
+  if (dataParser && dataParser.length > 0) {
+    console.log("Already parsed with params:", currentQueryParams);
+    return;
   }
 
   console.log("Fetching", apiUrl);
@@ -30,7 +46,7 @@ const handler = async (req: Request, context: Context) => {
 
   const pasedSongIds = songsResponse.map((song: any) => song.songId);
 
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from("songs")
     .select("songId")
     .in("songId", pasedSongIds);
@@ -57,19 +73,31 @@ const handler = async (req: Request, context: Context) => {
       };
     });
 
-  // TODO: Implement storing or updating parser info
-  // const { data, error } = await supabase.from("parser_logs").select("*").
-  // await supabase.from("parser_logs").insert([
-  //   {
-  //     sizeParam: parameters.size,
-  //     fromParam: parameters.from,
-  //     instParam: parameters.inst,
-  //     difficultyParam: parameters.difficulty,
-  //   },
-  // ]);
+  await supabase.from("parser_logs").insert([currentQueryParams]);
 
   await supabase.from("songs").insert(songsList);
-  console.log(data, error);
+}
+
+const handler = async (req: Request, context: Context) => {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    throw new Error("NEXT_PUBLIC_SUPABASE_URL not defined");
+  }
+
+  for (let difficulty of ["0", "1", "2"]) {
+    for (
+      let page = 0;
+      page < Math.floor(MAX_RESULT_ITEMS / ITEMS_PER_REQUEST);
+      page++
+    ) {
+      await parseWithParams({
+        from: page * ITEMS_PER_REQUEST,
+        size: ITEMS_PER_REQUEST,
+        difficulty: difficulty,
+        inst: "guitar",
+      });
+    }
+  }
+
   return new Response("Parsing finished!");
 };
 

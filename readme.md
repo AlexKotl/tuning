@@ -14,12 +14,12 @@ init Supabase cli: `supabase login`
 
 To run parser locally:
 Run dev server: `yarn dev:functions`
-Follow URL: http://localhost:8888/.netlify/functions/parser
+Follow URL: http://localhost:4001/.netlify/functions/parser
 
 ## Misc
 
 Songsterr API :
-https://www.songsterr.com/api/songs?size=10&from=10
+https://www.songsterr.com/api/songs?size=10&from=10&tuning=64,59,55,50,45,40
 
 Known parameters:
 
