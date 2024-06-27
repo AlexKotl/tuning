@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port=4000",
-    "dev:functions": "netlify dev --port=4001",
+    "dev": "netlify dev --port=4001",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

@@ -42,7 +42,7 @@ export default function Home() {
   return (
     <div className="flex gap-5 flex-col md:flex-row">
       <div className="flex-1">
-        <div className="card bg-base-100 shadow-xl ">
+        <div className="card bg-neutral text-neutral-content shadow-xl ">
           <div className="card-body p-10">
             <div>
               Quick picks: <br />
@@ -76,7 +76,7 @@ export default function Home() {
                     value={tuning[index] ?? ""}
                     onChange={handleTuningInputChange(index)}
                     placeholder="Tune"
-                    className="input w-full max-w-xs input-bordered my-1"
+                    className="input w-full max-w-xs input-bordered my-1 text-black text-bold"
                     maxLength={2}
                     minLength={1}
                   />
@@ -95,7 +95,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="card bg-base-100 shadow-xl my-5">
+        <div className="card  shadow-xl my-5">
           <div className="card-body">
             <About />
           </div>
@@ -113,7 +113,6 @@ export default function Home() {
               </a>
             </li>
           ))}
-          <li className="menu-title">Tuning that differs only by 1 string</li>
         </ul>
       </div>
     </div>
