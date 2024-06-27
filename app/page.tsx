@@ -1,74 +1,32 @@
 "use client";
 
 import { useState, ChangeEvent } from "react";
-import { createClient } from "@supabase/supabase-js";
 import {
   getSongExternalUrl,
   stringToNoteId,
   getSongTuningString,
 } from "@/utils/utils";
-import type { Database, Tables } from "@/supabase/database";
 import { tuningVariants } from "@/config/constants";
 import About from "./about";
+import { getSongsFromClient } from "@/api/songsterrApi";
+import type { SongsterrSong } from "@/api/songsterrApi";
 
 export default function Home() {
   const [tuning, setTuning] = useState<string[]>([]);
-  const [songs, setSongs] = useState<Tables<"songs">[]>([]);
-  const [additionalSongs, setAdditionalSongs] = useState<Tables<"songs">[]>([]);
+  const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  const supabase = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
-    process.env.NEXT_PUBLIC_SUPABASE_KEY ?? ""
-  );
 
   const fetchSongs = async () => {
     setIsLoading(true);
     setSongs([]);
-    setAdditionalSongs([]);
 
-    const { data, error } = await supabase
-      .from("songs")
-      .select()
-      .eq("string1TuningId", stringToNoteId(tuning[0], 0))
-      .eq("string2TuningId", stringToNoteId(tuning[1], 1))
-      .eq("string3TuningId", stringToNoteId(tuning[2], 2))
-      .eq("string4TuningId", stringToNoteId(tuning[3], 3))
-      .eq("string5TuningId", stringToNoteId(tuning[4], 4))
-      .eq("string6TuningId", stringToNoteId(tuning[5], 5));
+    const songs = await getSongsFromClient({
+      tuning: tuning
+        .map((note, index) => stringToNoteId(note, index))
+        .join(","),
+    });
 
-    if (error) {
-      console.error(error);
-    }
-
-    // TODO: Implement show more feature insted of slicing
-    setSongs(data?.slice(0, 20) ?? []);
-
-    if (data?.length && data?.length < 20) {
-      let additional: any = [];
-      for (let string = 1; string <= 6; string++) {
-        const matchCondition: any = {};
-        Array.from({ length: 6 }).map((_, index) => {
-          if (index + 1 !== string) {
-            matchCondition[`string${index + 1}TuningId`] = stringToNoteId(
-              tuning[index],
-              index
-            );
-          }
-        });
-
-        const { data: dataAdditional } = await supabase
-          .from("songs")
-          .select()
-          .match(matchCondition)
-          .neq(
-            `string${string}TuningId`,
-            stringToNoteId(tuning[string - 1], string - 1)
-          );
-        additional = [...additional, ...(dataAdditional ?? [])];
-      }
-      setAdditionalSongs(additional);
-    }
+    setSongs(songs);
 
     setIsLoading(false);
   };
@@ -148,22 +106,14 @@ export default function Home() {
         <ul className="menu bg-base-200 w-100 rounded-box">
           <li className="menu-title">Songs with this tuning:</li>
           {songs?.map((song) => (
-            <li key={song.id}>
+            <li key={song.songId}>
               <a href={getSongExternalUrl(song.songId)} target="_blank">
                 {song.artist}:<strong>{song.title}</strong>{" "}
-                <small>{song.views} views</small>
+                <small>{song.tracks[song.defaultTrack]?.views} views</small>
               </a>
             </li>
           ))}
           <li className="menu-title">Tuning that differs only by 1 string</li>
-          {additionalSongs?.map((song) => (
-            <li key={song.id}>
-              <a href={getSongExternalUrl(song.songId)} target="_blank">
-                {song.artist}:<strong>{song.title}</strong> (
-                {getSongTuningString(song)})<small>{song.views} views</small>
-              </a>
-            </li>
-          ))}
         </ul>
       </div>
     </div>
