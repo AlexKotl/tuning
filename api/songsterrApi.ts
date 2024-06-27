@@ -3,9 +3,10 @@ type SongsterrSongsParams = {
   from?: number;
   inst?: undefined | "guitar";
   difficulty?: "0" | "1" | "2";
+  tuning?: string;
 };
 
-type SongsterrResponse = {
+export type SongsterrSong = {
   hasPlayer: boolean;
   artist: string;
   artistId: number;
@@ -21,14 +22,17 @@ type SongsterrResponse = {
   }[];
   hasChords: boolean;
   defaultTrack: number;
-}[];
+};
 
-export const SONGSTERR_API_URL = "https://www.songsterr.com/api/songs?";
+type SongsterrResponse = SongsterrSong[];
 
-export async function getSongs(
+export async function getSongsFromClient(
   params: SongsterrSongsParams = {}
 ): Promise<SongsterrResponse> {
-  const response = await fetch(SONGSTERR_API_URL);
+  const queryParams = new URLSearchParams({
+    tuning: params.tuning ?? "",
+  }).toString();
+  const response = await fetch(`/api/songs?${queryParams}`);
   const songsResponse = (await response.json()) satisfies SongsterrResponse;
   return songsResponse;
 }
