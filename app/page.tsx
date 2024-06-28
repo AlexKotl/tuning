@@ -1,32 +1,37 @@
 "use client";
 
-import { useState, ChangeEvent } from "react";
-import {
-  getSongExternalUrl,
-  stringToNoteId,
-  getSongTuningString,
-} from "@/utils/utils";
+import { useState, ChangeEvent, useEffect } from "react";
+import { getSongExternalUrl, stringToNoteId } from "@/utils/utils";
+import { playTuning, load as loadSound, playNote } from "@/utils/sound";
 import { tuningVariants } from "@/config/constants";
 import About from "./about";
 import { getSongsFromClient } from "@/api/songsterrApi";
 import type { SongsterrSong } from "@/api/songsterrApi";
 
 export default function Home() {
-  const [tuning, setTuning] = useState<string[]>([]);
+  const [tuning, setTuning] = useState<string[]>(tuningVariants[0].tuning);
   const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    loadSound();
+  });
 
   const fetchSongs = async () => {
     setIsLoading(true);
     setSongs([]);
 
-    const songs = await getSongsFromClient({
-      tuning: tuning
-        .map((note, index) => stringToNoteId(note, index))
-        .join(","),
-    });
+    try {
+      const songs = await getSongsFromClient({
+        tuning: tuning
+          .map((note, index) => stringToNoteId(note, index))
+          .join(","),
+      });
 
-    setSongs(songs);
+      setSongs(songs);
+    } catch (e) {
+      alert("Oops, we cant get songs list :(");
+    }
 
     setIsLoading(false);
   };
@@ -35,14 +40,18 @@ export default function Home() {
     (index: number) => (event: ChangeEvent<HTMLInputElement>) => {
       const newTuning = tuning;
       newTuning[index] = (event.target as HTMLInputElement).value;
-      console.log("setting", newTuning);
       setTuning([...newTuning]);
     };
+
+  function handleQuickPickClick(tuning: string[]) {
+    setTuning(tuning);
+    playTuning(tuning);
+  }
 
   return (
     <div className="flex gap-5 flex-col md:flex-row">
       <div className="flex-1">
-        <div className="card bg-neutral text-neutral-content shadow-xl ">
+        <div className="card shadow-xl ">
           <div className="card-body p-10">
             <div>
               Quick picks: <br />
@@ -51,7 +60,7 @@ export default function Home() {
                   role="button"
                   key={index}
                   className="btn mx-1 my-1"
-                  onClick={() => setTuning(tuningVariant.tuning)}
+                  onClick={() => handleQuickPickClick(tuningVariant.tuning)}
                 >
                   <div className="flex flex-col items-start">
                     {tuningVariant.title && (
@@ -68,12 +77,18 @@ export default function Home() {
                 </a>
               ))}
             </div>
-            <div className="my-5 flex gap-2">
+            <div className="my-5 flex gap-2 ">
               {Array.from({ length: 6 }).map((_, index) => (
                 <div key={index}>
+                  <button
+                    className="btn btn-warning  btn-sm"
+                    onClick={() => playNote(tuning[5 - index])}
+                  >
+                    <img src="/images/note.svg" width={20}></img>
+                  </button>
                   <input
                     type="text"
-                    value={tuning[index] ?? ""}
+                    value={tuning[5 - index] ?? ""}
                     onChange={handleTuningInputChange(index)}
                     placeholder="Tune"
                     className="input w-full max-w-xs input-bordered my-1 text-black text-bold"
