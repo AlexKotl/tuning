@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 import { getSongExternalUrl, stringToNoteId } from "@/utils/utils";
 import { playTuning, load as loadSound, playNote } from "@/utils/sound";
 import { tuningVariants } from "@/config/constants";
@@ -13,7 +13,9 @@ export default function Home() {
   const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  loadSound();
+  useEffect(() => {
+    loadSound();
+  });
 
   const fetchSongs = async () => {
     setIsLoading(true);
