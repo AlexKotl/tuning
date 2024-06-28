@@ -6,7 +6,7 @@ import {
   stringToNoteId,
   getSongTuningString,
 } from "@/utils/utils";
-import { playTuning, load as loadSound } from "@/utils/sound";
+import { playTuning, load as loadSound, playNote } from "@/utils/sound";
 import { tuningVariants } from "@/config/constants";
 import About from "./about";
 import { getSongsFromClient } from "@/api/songsterrApi";
@@ -38,7 +38,6 @@ export default function Home() {
     (index: number) => (event: ChangeEvent<HTMLInputElement>) => {
       const newTuning = tuning;
       newTuning[index] = (event.target as HTMLInputElement).value;
-      console.log("setting", newTuning);
       setTuning([...newTuning]);
     };
 
@@ -76,9 +75,15 @@ export default function Home() {
                 </a>
               ))}
             </div>
-            <div className="my-5 flex gap-2">
+            <div className="my-5 flex gap-2 ">
               {Array.from({ length: 6 }).map((_, index) => (
                 <div key={index}>
+                  <button
+                    className="btn btn-warning  btn-sm"
+                    onClick={() => playNote(tuning[5 - index])}
+                  >
+                    <img src="/images/note.svg" width={20}></img>
+                  </button>
                   <input
                     type="text"
                     value={tuning[5 - index] ?? ""}

@@ -16,32 +16,25 @@ export function load() {
   }).toDestination();
 }
 
-export function playNote(noteWithOctave: string) {
-  Tone.loaded().then(() => {
-    sampler.triggerAttackRelease(noteWithOctave, 4);
-  });
+export function playNote(note: string, octave = 4): void {
+  if (!note) {
+    return;
+  }
+  sampler.triggerAttackRelease(`${note}${octave}`, 4);
 }
 
 export function playTuning(tuning: string[]) {
-  console.log("playing", tuning);
   for (let index = 0; index < tuning.length; index++) {
     setTimeout(() => {
       const stringNumber = stringToNoteId(tuning[index], index);
-      let octave = "3";
+      let octave = 3;
       if (stringNumber >= 48) {
-        octave = "4";
+        octave = 4;
       }
       if (stringNumber >= 60) {
-        octave = "5";
+        octave = 5;
       }
-      console.log(
-        "stringNumber",
-        stringNumber,
-        tuning[index],
-        "octave",
-        octave
-      );
-      playNote(tuning[index] + octave);
+      playNote(tuning[index], octave);
     }, (6 - index) * 250);
   }
 }
