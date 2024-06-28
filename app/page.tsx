@@ -1,11 +1,7 @@
 "use client";
 
 import { useState, ChangeEvent } from "react";
-import {
-  getSongExternalUrl,
-  stringToNoteId,
-  getSongTuningString,
-} from "@/utils/utils";
+import { getSongExternalUrl, stringToNoteId } from "@/utils/utils";
 import { playTuning, load as loadSound, playNote } from "@/utils/sound";
 import { tuningVariants } from "@/config/constants";
 import About from "./about";
@@ -13,7 +9,7 @@ import { getSongsFromClient } from "@/api/songsterrApi";
 import type { SongsterrSong } from "@/api/songsterrApi";
 
 export default function Home() {
-  const [tuning, setTuning] = useState<string[]>([]);
+  const [tuning, setTuning] = useState<string[]>(tuningVariants[0].tuning);
   const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,13 +19,17 @@ export default function Home() {
     setIsLoading(true);
     setSongs([]);
 
-    const songs = await getSongsFromClient({
-      tuning: tuning
-        .map((note, index) => stringToNoteId(note, index))
-        .join(","),
-    });
+    try {
+      const songs = await getSongsFromClient({
+        tuning: tuning
+          .map((note, index) => stringToNoteId(note, index))
+          .join(","),
+      });
 
-    setSongs(songs);
+      setSongs(songs);
+    } catch (e) {
+      alert("Oops, we cant get songs list :(");
+    }
 
     setIsLoading(false);
   };
