@@ -6,6 +6,7 @@ import {
   stringToNoteId,
   getSongTuningString,
 } from "@/utils/utils";
+import { playTuning, load as loadSound } from "@/utils/sound";
 import { tuningVariants } from "@/config/constants";
 import About from "./about";
 import { getSongsFromClient } from "@/api/songsterrApi";
@@ -15,6 +16,8 @@ export default function Home() {
   const [tuning, setTuning] = useState<string[]>([]);
   const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  loadSound();
 
   const fetchSongs = async () => {
     setIsLoading(true);
@@ -39,10 +42,15 @@ export default function Home() {
       setTuning([...newTuning]);
     };
 
+  function handleQuickPickClick(tuning: string[]) {
+    setTuning(tuning);
+    playTuning(tuning);
+  }
+
   return (
     <div className="flex gap-5 flex-col md:flex-row">
       <div className="flex-1">
-        <div className="card bg-neutral text-neutral-content shadow-xl ">
+        <div className="card shadow-xl ">
           <div className="card-body p-10">
             <div>
               Quick picks: <br />
@@ -51,7 +59,7 @@ export default function Home() {
                   role="button"
                   key={index}
                   className="btn mx-1 my-1"
-                  onClick={() => setTuning(tuningVariant.tuning)}
+                  onClick={() => handleQuickPickClick(tuningVariant.tuning)}
                 >
                   <div className="flex flex-col items-start">
                     {tuningVariant.title && (
@@ -73,7 +81,7 @@ export default function Home() {
                 <div key={index}>
                   <input
                     type="text"
-                    value={tuning[index] ?? ""}
+                    value={tuning[5 - index] ?? ""}
                     onChange={handleTuningInputChange(index)}
                     placeholder="Tune"
                     className="input w-full max-w-xs input-bordered my-1 text-black text-bold"
