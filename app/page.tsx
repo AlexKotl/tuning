@@ -54,6 +54,7 @@ export default function Home() {
         <div className="card shadow-xl ">
           <div className="card-body p-10">
             <div>
+              {tuning} <br></br>
               Quick picks: <br />
               {tuningVariants.map((tuningVariant, index) => (
                 <a
@@ -89,7 +90,7 @@ export default function Home() {
                   <input
                     type="text"
                     value={tuning[5 - index] ?? ""}
-                    onChange={handleTuningInputChange(index)}
+                    onChange={handleTuningInputChange(5 - index)}
                     placeholder="Tune"
                     className="input w-full max-w-xs input-bordered my-1 text-black text-bold"
                     maxLength={2}
