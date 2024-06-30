@@ -3,7 +3,7 @@
 import { useState, ChangeEvent, useEffect } from "react";
 import { getSongExternalUrl, stringToNoteId } from "@/utils/utils";
 import { playTuning, load as loadSound, playNote } from "@/utils/sound";
-import { tuningVariants } from "@/config/constants";
+import { tuningVariants, notesVariants } from "@/config/constants";
 import About from "./about";
 import { getSongsFromClient } from "@/api/songsterrApi";
 import type { SongsterrSong } from "@/api/songsterrApi";
@@ -37,9 +37,9 @@ export default function Home() {
   };
 
   const handleTuningInputChange =
-    (index: number) => (event: ChangeEvent<HTMLInputElement>) => {
+    (index: number) => (event: ChangeEvent<HTMLSelectElement>) => {
       const newTuning = tuning;
-      newTuning[index] = (event.target as HTMLInputElement).value;
+      newTuning[index] = (event.target as HTMLSelectElement).value;
       setTuning([...newTuning]);
     };
 
@@ -54,7 +54,6 @@ export default function Home() {
         <div className="card shadow-xl ">
           <div className="card-body p-10">
             <div>
-              {tuning} <br></br>
               Quick picks: <br />
               {tuningVariants.map((tuningVariant, index) => (
                 <a
@@ -87,15 +86,17 @@ export default function Home() {
                   >
                     <img src="/images/note.svg" width={20}></img>
                   </button>
-                  <input
-                    type="text"
+                  <select
+                    className="input w-full max-w-xs input-bordered my-1 text-black text-bold"
                     value={tuning[5 - index] ?? ""}
                     onChange={handleTuningInputChange(5 - index)}
-                    placeholder="Tune"
-                    className="input w-full max-w-xs input-bordered my-1 text-black text-bold"
-                    maxLength={2}
-                    minLength={1}
-                  />
+                  >
+                    {notesVariants.map((note) => (
+                      <option key={note + index} value={note}>
+                        {note}
+                      </option>
+                    ))}
+                  </select>
                   <div className=" text-xs">String {6 - index}</div>
                 </div>
               ))}

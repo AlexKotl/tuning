@@ -3,6 +3,21 @@ type TuningVariant = {
   tuning: string[];
 };
 
+export const notesVariants = [
+  "A",
+  "A#",
+  "B",
+  "C",
+  "C#",
+  "D",
+  "D#",
+  "E",
+  "F",
+  "F#",
+  "G",
+  "G#",
+];
+
 export const tuningVariants: TuningVariant[] = [
   {
     title: "Standard",
