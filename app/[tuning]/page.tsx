@@ -13,7 +13,7 @@ export default function Home() {
   const pathname = usePathname();
   const defaultTuning = tuningVariants[0].tuning;
   const [tuning, setTuning] = useState<string[]>(
-    pathname === "/" || pathname === "/tuning" ? defaultTuning : pathname.slice(1).split("-")
+    pathname === "/" || pathname === "/tuning" ? defaultTuning : pathname.slice(1).replace(/sharp/, "#").split("-")
   );
   const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,14 +42,14 @@ export default function Home() {
       const newTuning = tuning;
       newTuning[index] = (event.target as HTMLSelectElement).value;
       setTuning([...newTuning]);
-      const newPath = newTuning.join("-");
+      const newPath = newTuning.join("-").replace(/#/, "sharp");
       router.push(newPath === defaultTuning.join("-") ? "/" : `/${newPath}`);
     };
 
   function handleQuickPickClick(tuning: string[]) {
     setTuning(tuning);
     playTuning(tuning);
-    const newPath = tuning.join("-");
+    const newPath = tuning.join("-").replace(/#/, "sharp");
     router.push(newPath === defaultTuning.join("-") ? "/" : `/${newPath}`);
   }
 
