@@ -7,9 +7,15 @@ import { tuningVariants, notesVariants } from "@/config/constants";
 import About from "./about";
 import { getSongsFromClient } from "@/api/songsterrApi";
 import type { SongsterrSong } from "@/api/songsterrApi";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function Home() {
-  const [tuning, setTuning] = useState<string[]>(tuningVariants[0].tuning);
+  const router = useRouter();
+  const pathname = usePathname();
+  const defaultTuning = tuningVariants[0].tuning;
+  const [tuning, setTuning] = useState<string[]>(
+    pathname === "/" ? defaultTuning : pathname.slice(1).split("-")
+  );
   const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -37,11 +43,15 @@ export default function Home() {
       const newTuning = tuning;
       newTuning[index] = (event.target as HTMLSelectElement).value;
       setTuning([...newTuning]);
+      const newPath = newTuning.join("-");
+      router.push(newPath === defaultTuning.join("-") ? "/" : `/${newPath}`);
     };
 
   function handleQuickPickClick(tuning: string[]) {
     setTuning(tuning);
     playTuning(tuning);
+    const newPath = tuning.join("-");
+    router.push(newPath === defaultTuning.join("-") ? "/" : `/${newPath}`);
   }
 
   return (
