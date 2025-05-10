@@ -42,14 +42,6 @@ export function playNote(note: string, stringNo: number): void {
 export function playTuning(tuning: string[]) {
   for (let index = 0; index < tuning.length; index++) {
     setTimeout(() => {
-      const noteId = stringToNoteId(tuning[index], index);
-      let octave = 3;
-      if (noteId >= 48) {
-        octave = 4;
-      }
-      if (noteId >= 60) {
-        octave = 5;
-      }
       playNote(tuning[index], index);
     }, (6 - index) * 250);
   }

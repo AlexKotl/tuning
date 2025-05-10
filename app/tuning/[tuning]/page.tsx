@@ -13,7 +13,7 @@ export default function Home() {
   const pathname = usePathname();
   const defaultTuning = tuningVariants[0].tuning;
   const [tuning, setTuning] = useState<string[]>(
-    pathname === "/" || pathname === "/standard" ? defaultTuning : pathname.split("/").pop()?.replace(/sharp/, "#").split("-") || defaultTuning
+    pathname === "/" || pathname === "/tuning/standard" ? defaultTuning : pathname.split("/").pop()?.replace(/sharp/, "#").split("-") || defaultTuning
   );
   const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoading, setIsLoading] = useState(false);
