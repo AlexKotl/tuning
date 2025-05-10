@@ -87,7 +87,7 @@ export default function Home() {
                 <div key={index}>
                   <button
                     className="btn btn-warning  btn-sm"
-                    onClick={() => playNote(tuning[5 - index])}
+                    onClick={() => playNote(tuning[5 - index], 5 - index)}
                   >
                     <img src="/images/note.svg" width={20}></img>
                   </button>
