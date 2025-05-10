@@ -2,7 +2,7 @@
 
 export default function About() {
   return (
-    <div>
+    <div className="prose">
       <p>
         As a fingerstyle player - I like to change guitar tuning very often.
       </p>
