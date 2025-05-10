@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
 import { getSongExternalUrl, stringToNoteId } from "@/utils/utils";
 import { playTuning, playNote } from "@/utils/sound";
 import { tuningVariants, notesVariants } from "@/config/constants";
@@ -17,6 +17,10 @@ export default function Home() {
   );
   const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    
+  }, []);
 
   const fetchSongs = async () => {
     setIsLoading(true);
@@ -47,14 +51,21 @@ export default function Home() {
     };
 
   function handleQuickPickClick(tuning: string[]) {
-    setTuning(tuning);
-    playTuning(tuning);
-    const newPath = tuning.join("-").replace(/#/, "sharp");
-    router.push(newPath === defaultTuning.join("-") ? "/tuning/standard" : `/tuning/${newPath}`);
+    const startSound = document.getElementById("start-sound") as HTMLAudioElement;
+    startSound?.play();
+
+    setTimeout(() => {
+      setTuning(tuning);
+      playTuning(tuning);
+      const newPath = tuning.join("-").replace(/#/, "sharp");
+      router.push(newPath === defaultTuning.join("-") ? "/tuning/standard" : `/tuning/${newPath}`);
+    }, 1000);
   }
 
   return (
     <div className="flex gap-5 flex-col md:flex-row">
+      <audio id="start-sound" src="/start.mp3"></audio>
+
       <div className="flex-1">
         <div className="card shadow-xl ">
           <div className="card-body p-10">
