@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, ChangeEvent, useEffect } from "react";
+import { useState, ChangeEvent } from "react";
 import { getSongExternalUrl, stringToNoteId } from "@/utils/utils";
-import { playTuning, load as loadSound, playNote } from "@/utils/sound";
+import { playTuning, playNote } from "@/utils/sound";
 import { tuningVariants, notesVariants } from "@/config/constants";
 import About from "../../../components/About";
 import { getSongsFromClient, type SongsterrSong } from "@/api/songsterrApi";
