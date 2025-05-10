@@ -4,7 +4,7 @@ import { useState, ChangeEvent, useEffect } from "react";
 import { getSongExternalUrl, stringToNoteId } from "@/utils/utils";
 import { playTuning, load as loadSound, playNote } from "@/utils/sound";
 import { tuningVariants, notesVariants } from "@/config/constants";
-import About from "../../components/About";
+import About from "../../../components/About";
 import { getSongsFromClient, type SongsterrSong } from "@/api/songsterrApi";
 import { useRouter, usePathname } from "next/navigation";
 
@@ -13,7 +13,7 @@ export default function Home() {
   const pathname = usePathname();
   const defaultTuning = tuningVariants[0].tuning;
   const [tuning, setTuning] = useState<string[]>(
-    pathname === "/" || pathname === "/tuning" ? defaultTuning : pathname.slice(1).replace(/sharp/, "#").split("-")
+    pathname === "/" || pathname === "/standard" ? defaultTuning : pathname.slice(1).replace(/sharp/, "#").split("-")
   );
   const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,14 +43,14 @@ export default function Home() {
       newTuning[index] = (event.target as HTMLSelectElement).value;
       setTuning([...newTuning]);
       const newPath = newTuning.join("-").replace(/#/, "sharp");
-      router.push(newPath === defaultTuning.join("-") ? "/" : `/${newPath}`);
+      router.push(newPath === defaultTuning.join("-") ? "/tuning/standard" : `/tuning/${newPath}`);
     };
 
   function handleQuickPickClick(tuning: string[]) {
     setTuning(tuning);
     playTuning(tuning);
     const newPath = tuning.join("-").replace(/#/, "sharp");
-    router.push(newPath === defaultTuning.join("-") ? "/" : `/${newPath}`);
+    router.push(newPath === defaultTuning.join("-") ? "/tuning/standard" : `/tuning/${newPath}`);
   }
 
   return (
