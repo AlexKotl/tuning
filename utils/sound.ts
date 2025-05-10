@@ -2,8 +2,9 @@ import * as Tone from "tone";
 import { stringToNoteId } from "./utils";
 
 let sampler: Tone.Sampler;
+let isLoaded = false;
 
-export function load() {
+export function load(callback: () => void) {
   sampler = new Tone.Sampler({
     urls: {
       C4: "C4.mp3",
@@ -13,14 +14,20 @@ export function load() {
     },
     release: 1,
     baseUrl: "https://tonejs.github.io/audio/salamander/",
+    onload: callback,
   }).toDestination();
+  isLoaded = true;
 }
 
 export function playNote(note: string, octave = 4): void {
   if (!note) {
     return;
   }
-  sampler.triggerAttackRelease(`${note}${octave}`, 4);
+  if (!isLoaded) {
+    load(() => sampler.triggerAttackRelease(`${note}${octave}`, 4));
+  } else {
+    sampler.triggerAttackRelease(`${note}${octave}`, 4);
+  }
 }
 
 export function playTuning(tuning: string[]) {

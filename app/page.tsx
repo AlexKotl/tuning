@@ -13,10 +13,6 @@ export default function Home() {
   const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    loadSound();
-  });
-
   const fetchSongs = async () => {
     setIsLoading(true);
     setSongs([]);
