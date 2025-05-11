@@ -1,3 +1,5 @@
+// Legacy, we dont use as its not working on iPhones
+
 import * as Tone from "tone";
 import { stringToNoteId } from "./utils";
 

@@ -29,3 +29,7 @@ Known parameters:
 - inst: guitar
 - difficulty: 0 | 1 | 2
 - tuning: 62,57,53,48,43,38
+
+## Links
+
+All piano notes samples: https://freesound.org/search/?f=grouping_pack%3A%222489_Piano+FF%22&s=Date+added+%28newest+first%29&g=1&page=2#sound

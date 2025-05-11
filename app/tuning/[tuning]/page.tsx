@@ -2,11 +2,12 @@
 
 import { useState, ChangeEvent, useEffect } from "react";
 import { getSongExternalUrl, stringToNoteId } from "@/utils/utils";
-import { playTuning, playNote } from "@/utils/sound";
 import { tuningVariants, notesVariants } from "@/config/constants";
 import About from "../../../components/About";
 import { getSongsFromClient, type SongsterrSong } from "@/api/songsterrApi";
 import { useRouter, usePathname } from "next/navigation";
+
+const SOUND_FILE_INDEX_DIFF = 8
 
 export default function Home() {
   const router = useRouter();
@@ -51,21 +52,19 @@ export default function Home() {
     };
 
   function handleQuickPickClick(tuning: string[]) {
-    const startSound = document.getElementById("start-sound") as HTMLAudioElement;
-    startSound?.play();
-
-    setTimeout(() => {
       setTuning(tuning);
-      playTuning(tuning);
       const newPath = tuning.join("-").replace(/#/, "sharp");
       router.push(newPath === defaultTuning.join("-") ? "/tuning/standard" : `/tuning/${newPath}`);
-    }, 1000);
+      // TODO: implement play tuning
+  }
+
+  function playStringNote(index: number) {
+    const note = document.getElementById(`note-${index}`) as HTMLAudioElement;
+    note.play();
   }
 
   return (
     <div className="flex gap-5 flex-col md:flex-row">
-      <audio id="start-sound" src="/start.mp3"></audio>
-
       <div className="flex-1">
         <div className="card shadow-xl ">
           <div className="card-body p-10">
@@ -96,9 +95,10 @@ export default function Home() {
             <div className="my-5 flex gap-2 ">
               {Array.from({ length: 6 }).map((_, index) => (
                 <div key={index}>
+                  <audio id={`note-${index}`} src={`/sounds/piano/piano-ff-0${stringToNoteId(tuning[5 - index], 5 - index) - SOUND_FILE_INDEX_DIFF}.wav`}></audio>
                   <button
-                    className="btn btn-warning  btn-sm"
-                    onClick={() => playNote(tuning[5 - index], 5 - index)}
+                    className="btn btn-warning btn-sm"
+                    onClick={() => playStringNote(index)}
                   >
                     <img src="/images/note.svg" width={20}></img>
                   </button>
