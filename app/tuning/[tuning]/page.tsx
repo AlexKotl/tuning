@@ -14,7 +14,7 @@ export default function Home() {
   const pathname = usePathname();
   const defaultTuning = tuningVariants[0].tuning;
   const [tuning, setTuning] = useState<string[]>(
-    pathname === "/" || pathname === "/tuning/standard" ? defaultTuning : pathname.split("/").pop()?.replace(/sharp/, "#").split("-") || defaultTuning
+    pathname === "/" || pathname === "/tuning/standard" ? defaultTuning : pathname.split("/").pop()?.replace(/sharp/g, "#").split("-") || defaultTuning
   );
   const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,13 +47,13 @@ export default function Home() {
       const newTuning = tuning;
       newTuning[index] = (event.target as HTMLSelectElement).value;
       setTuning([...newTuning]);
-      const newPath = newTuning.join("-").replace(/#/, "sharp");
+      const newPath = newTuning.join("-").replace(/#/g, "sharp");
       router.push(newPath === defaultTuning.join("-") ? "/tuning/standard" : `/tuning/${newPath}`);
     };
 
   function handleQuickPickClick(tuning: string[]) {
       setTuning(tuning);
-      const newPath = tuning.join("-").replace(/#/, "sharp");
+      const newPath = tuning.join("-").replace(/#/g, "sharp");
       router.push(newPath === defaultTuning.join("-") ? "/tuning/standard" : `/tuning/${newPath}`);
       // TODO: implement play tuning
   }
