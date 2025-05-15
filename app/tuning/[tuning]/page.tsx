@@ -21,8 +21,14 @@ export default function Home() {
   const [loadedSounds, setLoadedSounds] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
-    
-  }, []);
+    // Preload audio files when component mounts or tuning changes
+    Array.from({ length: 6 }).forEach((_, index) => {
+      const audio = document.getElementById(`note-${index}`) as HTMLAudioElement;
+      if (audio) {
+        audio.load();
+      }
+    });
+  }, [tuning]);
 
   const fetchSongs = async () => {
     setIsLoading(true);
@@ -65,7 +71,6 @@ export default function Home() {
   }
 
   function handleSoundLoaded(index: number) {
-    console.log("loaded", index);
     setLoadedSounds(prev => ({
       ...prev,
       [`note-${index}`]: true
@@ -108,6 +113,7 @@ export default function Home() {
                     id={`note-${index}`} 
                     src={`/sounds/piano/piano-ff-0${stringToNoteId(tuning[5 - index], 5 - index) - SOUND_FILE_INDEX_DIFF}.wav`}
                     onLoadedData={() => handleSoundLoaded(index)}
+                    preload="auto"
                   ></audio>
                   <button
                     className="btn btn-warning btn-sm"
