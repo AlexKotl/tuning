@@ -19,6 +19,26 @@ export default function Home() {
   const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadedSounds, setLoadedSounds] = useState<{ [key: string]: boolean }>({});
+  const [isContinuousPlay, setIsContinuousPlay] = useState(false);
+
+  const stopAllNotes = (excludeIndex?: number) => {
+    Array.from({ length: 6 }).forEach((_, index) => {
+      if (index !== excludeIndex) {
+        const note = document.getElementById(`note-${index}`) as HTMLAudioElement;
+        if (note) {
+          note.pause();
+          note.currentTime = 0;
+        }
+      }
+    });
+  };
+
+  useEffect(() => {
+    // Stop all notes when continuous play is disabled
+    if (!isContinuousPlay) {
+      stopAllNotes();
+    }
+  }, [isContinuousPlay]);
 
   useEffect(() => {
     // Preload audio files when component mounts or tuning changes
@@ -66,7 +86,11 @@ export default function Home() {
   }
 
   function playStringNote(index: number) {
+    // Stop all other notes first
+    stopAllNotes(index);
+
     const note = document.getElementById(`note-${index}`) as HTMLAudioElement;
+    note.loop = isContinuousPlay;
     note.play();
   }
 
@@ -106,6 +130,19 @@ export default function Home() {
                 </a>
               ))}
             </div>
+
+            <div className="flex items-center gap-2">
+                <label className="label cursor-pointer">
+                <input
+                    type="checkbox"
+                    className="toggle toggle-primary"
+                    checked={isContinuousPlay}
+                    onChange={(e) => setIsContinuousPlay(e.target.checked)}
+                  />
+                  <span className="label-text ml-2">Continuous Note Play</span>
+                </label>
+              </div>
+
             <div className="my-5 flex gap-2 ">
               {Array.from({ length: 6 }).map((_, index) => (
                 <div key={index}>
