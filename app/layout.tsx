@@ -16,7 +16,9 @@ export default function RootLayout({
       <body className="container mx-auto">
         <main>
           <div className="navbar bg-base-100">
-            <a className="btn btn-ghost text-lg">Tuning Geek</a>
+            <a className="btn btn-ghost text-lg">
+            🔝 Fingerstyle Top  
+            </a>
           </div>
           
           {children}

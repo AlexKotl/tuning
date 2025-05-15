@@ -6,7 +6,7 @@ export async function generateMetadata({ params }: { params: { tuning: string } 
     : params.tuning.replace(/sharp/, "#").split("-").join(" ");
 
   return {
-    title: `Tuning Geek | ${tuning}`,
+    title: `Fingerstyle Top 🔝 | ${tuning}`,
     description: "Find any guitar tab by defined tuning",
   };
 }
