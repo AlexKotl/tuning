@@ -18,6 +18,7 @@ export default function Home() {
   );
   const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadedSounds, setLoadedSounds] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
     
@@ -63,6 +64,14 @@ export default function Home() {
     note.play();
   }
 
+  function handleSoundLoaded(index: number) {
+    console.log("loaded", index);
+    setLoadedSounds(prev => ({
+      ...prev,
+      [`note-${index}`]: true
+    }));
+  }
+
   return (
     <div className="flex gap-5 flex-col md:flex-row">
       <div className="flex-1">
@@ -95,12 +104,19 @@ export default function Home() {
             <div className="my-5 flex gap-2 ">
               {Array.from({ length: 6 }).map((_, index) => (
                 <div key={index}>
-                  <audio id={`note-${index}`} src={`/sounds/piano/piano-ff-0${stringToNoteId(tuning[5 - index], 5 - index) - SOUND_FILE_INDEX_DIFF}.wav`}></audio>
+                  <audio 
+                    id={`note-${index}`} 
+                    src={`/sounds/piano/piano-ff-0${stringToNoteId(tuning[5 - index], 5 - index) - SOUND_FILE_INDEX_DIFF}.wav`}
+                    onLoadedData={() => handleSoundLoaded(index)}
+                  ></audio>
                   <button
                     className="btn btn-warning btn-sm"
                     onClick={() => playStringNote(index)}
+                    disabled={!loadedSounds[`note-${index}`]}
                   >
-                    <img src="/images/note.svg" width={20}></img>
+                    {!loadedSounds[`note-${index}`] 
+                      ? <span className="loading loading-spinner loading-xs"></span> 
+                      : <img src="/images/note.svg" width={20}></img>}
                   </button>
                   <select
                     className="input w-full max-w-xs input-bordered my-1 text-black text-bold"
