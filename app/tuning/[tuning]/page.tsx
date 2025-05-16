@@ -94,6 +94,7 @@ export default function Home() {
         songs={songs} 
         isLoading={isLoading} 
         onFetchSongs={fetchSongs} 
+        tuning={tuning}
       />
     </div>
   );

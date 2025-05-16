@@ -1,15 +1,16 @@
 "use client";
 
-import { getSongExternalUrl } from "@/utils/utils";
+import { getSongExternalUrl, tuningToString } from "@/utils/utils";
 import { SongsterrSong } from "@/api/songsterrApi";
 
 interface SongsListProps {
   songs: SongsterrSong[];
+  tuning: string[];
   isLoading: boolean;
   onFetchSongs: () => void;
 }
 
-export default function SongsList({ songs, isLoading, onFetchSongs }: SongsListProps) {
+export default function SongsList({ songs, isLoading, onFetchSongs, tuning }: SongsListProps) {
   return (
     <div className="flex-1">
       <button
@@ -18,7 +19,7 @@ export default function SongsList({ songs, isLoading, onFetchSongs }: SongsListP
         disabled={isLoading}
       >
         {isLoading && <span className="loading loading-spinner"></span>}
-        Search songs with tuning
+        Search songs with {tuningToString(tuning)} tuning
       </button>
     
       <ul className="menu bg-base-200 w-100 rounded-box">

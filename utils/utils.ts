@@ -30,3 +30,7 @@ export function getSongTuningString(song: any) {
   }
   return tuningString;
 }
+
+export function tuningToString(tuning: string[]) {
+  return tuning.reverse().join("");
+}
