@@ -31,6 +31,8 @@ export async function getSongsFromClient(
 ): Promise<SongsterrResponse> {
   const queryParams = new URLSearchParams({
     tuning: params.tuning ?? "",
+    size: params.size?.toString() ?? "20",
+    from: params.from?.toString() ?? "0",
   }).toString();
   const response = await fetch(`/api/songs?${queryParams}`);
   const songsResponse = (await response.json()) satisfies SongsterrResponse;

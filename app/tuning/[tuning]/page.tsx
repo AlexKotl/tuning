@@ -19,6 +19,10 @@ export default function Home() {
   const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isContinuousPlay, setIsContinuousPlay] = useState(false);
+  const [page, setPage] = useState(0);
+  const pageSize = 20;
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   useEffect(() => {
     // Stop all notes when continuous play is disabled
@@ -42,20 +46,51 @@ export default function Home() {
   const fetchSongs = async () => {
     setIsLoading(true);
     setSongs([]);
+    setPage(0);
+    setHasMore(true);
 
     try {
       const songs = await getSongsFromClient({
         tuning: tuning
           .map((note, index) => stringToNoteId(note, index))
           .join(","),
+        size: pageSize,
+        from: 0,
       });
 
       setSongs(songs);
+      setHasMore(songs.length === pageSize);
     } catch (e) {
       alert("Oops, we cant get songs list :(");
     }
 
     setIsLoading(false);
+  };
+
+  const loadMoreSongs = async () => {
+    if (isLoadingMore || !hasMore) return;
+
+    setIsLoadingMore(true);
+    const nextPage = page + 1;
+    const from = nextPage * pageSize;
+
+    try {
+      const moreSongs = await getSongsFromClient({
+        tuning: tuning
+          .map((note, index) => stringToNoteId(note, index))
+          .join(","),
+        size: pageSize,
+        from,
+      });
+
+      setSongs((prevSongs) => [...prevSongs, ...moreSongs]);
+      setPage(nextPage);
+      setHasMore(moreSongs.length === pageSize);
+    } catch (e) {
+      alert("Oops, we cant get more songs :(");
+    }
+
+    setIsLoadingMore(false);
   };
 
   const handleTuningChange = (index: number, value: string) => {
@@ -95,6 +130,9 @@ export default function Home() {
         isLoading={isLoading} 
         onFetchSongs={fetchSongs} 
         tuning={tuning}
+        hasMore={hasMore}
+        isLoadingMore={isLoadingMore}
+        onLoadMore={loadMoreSongs}
       />
     </div>
   );

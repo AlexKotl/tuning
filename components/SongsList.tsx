@@ -8,9 +8,20 @@ interface SongsListProps {
   tuning: string[];
   isLoading: boolean;
   onFetchSongs: () => void;
+  hasMore?: boolean;
+  isLoadingMore?: boolean;
+  onLoadMore?: () => void;
 }
 
-export default function SongsList({ songs, isLoading, onFetchSongs, tuning }: SongsListProps) {
+export default function SongsList({ 
+  songs, 
+  isLoading, 
+  onFetchSongs, 
+  tuning, 
+  hasMore = false, 
+  isLoadingMore = false, 
+  onLoadMore 
+}: SongsListProps) {
   return (
     <div className="flex-1">
       <button
@@ -32,6 +43,19 @@ export default function SongsList({ songs, isLoading, onFetchSongs, tuning }: So
             </a>
           </li>
         ))}
+        
+        {songs.length > 0 && hasMore && (
+          <li className="p-2">
+            <button 
+              className="btn btn-secondary w-full" 
+              onClick={onLoadMore}
+              disabled={isLoadingMore}
+            >
+              {isLoadingMore && <span className="loading loading-spinner"></span>}
+              Load More
+            </button>
+          </li>
+        )}
       </ul>
     </div>
   );

@@ -8,7 +8,9 @@ UI: https://daisyui.com/
 
 ## Dev
 
-init Supabase cli: `supabase login`
+If netlify cli not installed: `npm install -g netlify-cli`
+`yarn dev-netlify`
+This will run netlify functions + local server
 
 ## Data parser
 
