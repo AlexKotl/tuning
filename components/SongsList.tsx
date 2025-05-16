@@ -27,15 +27,6 @@ export default function SongsList({
 
   return (
     <div className="flex-1">
-      <button
-        className="btn btn-primary mb-5 w-full"
-        onClick={onFetchSongs}
-        disabled={isLoading}
-      >
-        {isLoading && <span className="loading loading-spinner"></span>}
-        Search songs with {tuningToString(tuning)} tuning
-      </button>
-    
       <ul className="menu bg-base-200 w-100 rounded-box">
         <li className="menu-title">Songs with this tuning:</li>
         {songs?.map((song) => (
@@ -46,7 +37,8 @@ export default function SongsList({
                 target="_blank"
                 className="flex-1"
               >
-                {song.artist}:<strong>{song.title}</strong>{" "}
+                {song.artist}:{" "}
+                <strong>{song.title}</strong>{" "}
                 <small>{song.tracks[song.defaultTrack]?.views} views</small>
               </a>
               <button

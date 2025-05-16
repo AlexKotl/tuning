@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,9 +17,16 @@ export default function RootLayout({
       <body className="container mx-auto">
         <main>
           <div className="navbar bg-base-100">
-            <a className="btn btn-ghost text-lg">
-            🔝 Fingerstyle Top  
-            </a>
+            <div className="flex-1">
+              <Link href="/tuning/standard" className="btn btn-ghost text-lg">
+                🔝 Fingerstyle Top
+              </Link>
+            </div>
+            <div className="flex-none">
+              <Link href="/favorites" className="btn btn-ghost">
+                ★ Favorites
+              </Link>
+            </div>
           </div>
           
           {children}

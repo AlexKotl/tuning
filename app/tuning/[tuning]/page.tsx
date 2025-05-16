@@ -8,6 +8,7 @@ import { getSongsFromClient, type SongsterrSong } from "@/api/songsterrApi";
 import { useRouter, usePathname } from "next/navigation";
 import TuningPicker from "@/components/TuningPicker";
 import SongsList from "@/components/SongsList";
+import Link from "next/link";
 
 export default function Home() {
   const router = useRouter();
@@ -59,6 +60,30 @@ export default function Home() {
       });
 
       setSongs(songs);
+      
+      // Cache songs in localStorage for favorites page
+      const existingCache = localStorage.getItem('allSongsCache');
+      let allSongs: SongsterrSong[] = [];
+      
+      if (existingCache) {
+        try {
+          allSongs = JSON.parse(existingCache);
+          
+          // Add new songs that aren't already in the cache
+          songs.forEach(song => {
+            if (!allSongs.some(s => s.songId === song.songId)) {
+              allSongs.push(song);
+            }
+          });
+        } catch (e) {
+          allSongs = songs;
+        }
+      } else {
+        allSongs = songs;
+      }
+      
+      localStorage.setItem('allSongsCache', JSON.stringify(allSongs));
+      
       setHasMore(songs.length === pageSize);
     } catch (e) {
       alert("Oops, we cant get songs list :(");
@@ -84,6 +109,28 @@ export default function Home() {
       });
 
       setSongs((prevSongs) => [...prevSongs, ...moreSongs]);
+      
+      // Add more songs to cache
+      const existingCache = localStorage.getItem('allSongsCache');
+      let allSongs: SongsterrSong[] = [];
+      
+      if (existingCache) {
+        try {
+          allSongs = JSON.parse(existingCache);
+          
+          // Add new songs that aren't already in the cache
+          moreSongs.forEach(song => {
+            if (!allSongs.some(s => s.songId === song.songId)) {
+              allSongs.push(song);
+            }
+          });
+          
+          localStorage.setItem('allSongsCache', JSON.stringify(allSongs));
+        } catch (e) {
+          console.error('Error updating song cache', e);
+        }
+      }
+      
       setPage(nextPage);
       setHasMore(moreSongs.length === pageSize);
     } catch (e) {
@@ -125,15 +172,28 @@ export default function Home() {
         </div>
       </div>
 
-      <SongsList 
-        songs={songs} 
-        isLoading={isLoading} 
-        onFetchSongs={fetchSongs} 
-        tuning={tuning}
-        hasMore={hasMore}
-        isLoadingMore={isLoadingMore}
-        onLoadMore={loadMoreSongs}
-      />
+      <div className="flex-1">
+        <div className="flex items-center justify-between mb-5">
+          <button
+            className="btn btn-primary flex-grow mr-2"
+            onClick={fetchSongs}
+            disabled={isLoading}
+          >
+            {isLoading && <span className="loading loading-spinner"></span>}
+            Search songs with {tuning.join(" ")} tuning
+          </button>
+        </div>
+        
+        <SongsList 
+          songs={songs} 
+          isLoading={isLoading} 
+          onFetchSongs={fetchSongs} 
+          tuning={tuning}
+          hasMore={hasMore}
+          isLoadingMore={isLoadingMore}
+          onLoadMore={loadMoreSongs}
+        />
+      </div>
     </div>
   );
 }
