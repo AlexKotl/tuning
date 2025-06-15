@@ -1,20 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity, Modal, FlatList } from 'react-native';
 import { useState } from 'react';
+import { useTuning } from '@tuning/shared';
 
 export default function App() {
-  // Standard guitar tuning (low E to high E)
-  const [tuning, setTuning] = useState({
-    string6: 'E', // Low E
-    string5: 'A',
-    string4: 'D', 
-    string3: 'G',
-    string2: 'B',
-    string1: 'E'  // High E
-  });
+  const { tuning: defaultTuning } = useTuning();
 
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const [activeString, setActiveString] = useState<string>('');
+  const [tuning, setTuning] = useState(defaultTuning);
+
 
   const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
   const stringLabels = ['String 6', 'String 5', 'String 4', 'String 3', 'String 2', 'String 1'];
