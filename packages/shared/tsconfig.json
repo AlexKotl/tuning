@@ -1,0 +1,26 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "outDir": "./dist",
+        "rootDir": "./",
+        "declaration": true,
+        "noEmit": false,
+        "module": "commonjs",
+        "target": "es2018",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "include": [
+        "*.ts",
+        "constants/constants.ts",
+        "hooks/useTuning.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}
