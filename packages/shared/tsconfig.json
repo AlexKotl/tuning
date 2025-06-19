@@ -15,7 +15,9 @@
         "forceConsistentCasingInFileNames": true
     },
     "include": [
-        "*.ts"
+        "*.ts",
+        "constants/constants.ts",
+        "hooks/useTuning.ts"
     ],
     "exclude": [
         "node_modules",
