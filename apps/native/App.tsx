@@ -1,15 +1,23 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, Modal, FlatList } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Modal, FlatList, ScrollView } from 'react-native';
 import { useState } from 'react';
-import { useTuning } from '@tuning/shared';
+import { useTuning, tuningVariants } from '@tuning/shared';
+
+type TuningState = {
+  string6: string;
+  string5: string;
+  string4: string;
+  string3: string;
+  string2: string;
+  string1: string;
+};
 
 export default function App() {
   const { tuning: defaultTuning } = useTuning();
 
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const [activeString, setActiveString] = useState<string>('');
-  const [tuning, setTuning] = useState(defaultTuning);
-
+  const [tuning, setTuning] = useState<TuningState>(defaultTuning);
 
   const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
   const stringLabels = ['String 6', 'String 5', 'String 4', 'String 3', 'String 2', 'String 1'];
@@ -27,13 +35,46 @@ export default function App() {
     setIsPickerVisible(true);
   };
 
+  const applyTuningVariant = (tuningVariant: string[]) => {
+    const newTuning: TuningState = {
+      string6: tuningVariant[0],
+      string5: tuningVariant[1],
+      string4: tuningVariant[2],
+      string3: tuningVariant[3],
+      string2: tuningVariant[4],
+      string1: tuningVariant[5],
+    };
+    
+    setTuning(newTuning);
+  };
+
   return (
     <View style={styles.container}>
+      {/* Tuning Variants Buttons */}
+      <View style={styles.variantsContainer}>
+        <Text style={styles.variantsTitle}>Quick Tuning Presets</Text>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.variantsScrollContent}
+        >
+          {tuningVariants.map((variant: { title?: string; tuning: string[] }, index: number) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.variantButton}
+              onPress={() => applyTuningVariant(variant.tuning)}
+            >
+              <Text style={styles.variantTitle}>{variant.title}</Text>
+              <Text style={styles.variantTuning}>{variant.tuning.join(' ')}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
       <View style={styles.tuningContainer}>
         {Object.entries(tuning).map(([stringKey, selectedNote], index) => (
           <View key={stringKey} style={styles.stringContainer}>
             <Text style={styles.musicIcon}>♪</Text>
-            <Text style={styles.noteDisplay}>{selectedNote}</Text>
             <View style={styles.pickerContainer}>
               <TouchableOpacity 
                 style={styles.pickerButton}
@@ -173,6 +214,47 @@ const styles = StyleSheet.create({
   },
   noteOptionText: {
     fontSize: 16,
+    textAlign: 'center',
+  },
+  variantsContainer: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  variantsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  variantsScrollContent: {
+    paddingHorizontal: 10,
+  },
+  variantButton: {
+    backgroundColor: 'white',
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    marginRight: 10,
+    minWidth: 80,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  variantTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4,
+  },
+  variantTuning: {
+    fontSize: 11,
+    color: '#666',
     textAlign: 'center',
   },
 });

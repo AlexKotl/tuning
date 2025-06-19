@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+// TODO: refactor this to use shared package
 import { stringToNoteId } from "@/utils/utils";
 import { tuningVariants } from "@/config/constants";
 import About from "../../../components/About";

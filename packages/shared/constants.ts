@@ -1,4 +1,4 @@
-type TuningVariant = {
+export type TuningVariant = {
   title?: string;
   tuning: string[];
 };
