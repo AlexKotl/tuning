@@ -1,4 +1,4 @@
-import { SongsterrSong } from "@/api/songsterrApi";
+import { SongsterrSong } from "@tuning/shared/api";
 
 const FAVORITES_KEY = 'favorite_songs';
 

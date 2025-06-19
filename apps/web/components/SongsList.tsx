@@ -1,7 +1,7 @@
 "use client";
 
-import { getSongExternalUrl, tuningToString } from "@/utils/utils";
-import { SongsterrSong } from "@/api/songsterrApi";
+import { getSongExternalUrl } from "@tuning/shared";
+import { SongsterrSong } from "@tuning/shared/api";
 import { useFavorites } from "@/hooks/useFavorites";
 
 interface SongsListProps {

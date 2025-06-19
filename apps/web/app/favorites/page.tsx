@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { SongsterrSong } from "@/api/songsterrApi";
+import { SongsterrSong } from "@tuning/shared/api";
 import { useFavorites } from "@/hooks/useFavorites";
-import { getSongExternalUrl } from "@/utils/utils";
+import { getSongExternalUrl } from "@tuning/shared";
 
 export default function FavoritesPage() {
   const [allSongs, setAllSongs] = useState<SongsterrSong[]>([]);

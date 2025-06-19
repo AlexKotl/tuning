@@ -1,8 +1,8 @@
 "use client";
 
 import { ChangeEvent } from "react";
-import { tuningVariants } from "@/config/constants";
-import StringNote from "@/components/StringNote";
+import { tuningVariants } from "@tuning/shared";
+import StringNote from "./StringNote";
 
 interface TuningPickerProps {
   tuning: string[];

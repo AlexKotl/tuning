@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useFavorites } from "@/hooks/useFavorites";
-import { SongsterrSong } from "@/api/songsterrApi";
-import { getSongExternalUrl } from "@/utils/utils";
+import { SongsterrSong } from "@tuning/shared/api";
+import { getSongExternalUrl } from "@tuning/shared";
 
 interface FavoriteSongsListProps {
   allSongs: SongsterrSong[];

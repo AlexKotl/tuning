@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, ChangeEvent } from "react";
-import { stringToNoteId } from "@/utils/utils";
-import { notesVariants } from "@/config/constants";
+import { stringToNoteId } from "@tuning/shared";
+import { notesVariants } from "@tuning/shared";
 
 const SOUND_FILE_INDEX_DIFF = 8;
 

@@ -1,15 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-// TODO: refactor this to use shared package
-import { stringToNoteId } from "@/utils/utils";
-import { tuningVariants } from "@/config/constants";
+import { stringToNoteId } from "@tuning/shared";
+import { tuningVariants } from "@tuning/shared";
 import About from "../../../components/About";
-import { getSongsFromClient, type SongsterrSong } from "@/api/songsterrApi";
+import { getSongsFromClient, type SongsterrSong } from "@tuning/shared/api";
 import { useRouter, usePathname } from "next/navigation";
 import TuningPicker from "@/components/TuningPicker";
 import SongsList from "@/components/SongsList";
-import Link from "next/link";
 
 export default function Home() {
   const router = useRouter();
