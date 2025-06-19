@@ -60,6 +60,7 @@ export default function StringNote({
     <div>
       <audio 
         id={`note-${index}`} 
+        // TODO: Refactor with new util method
         src={`/sounds/piano/piano-ff-0${stringToNoteId(tuning[actualIndex], actualIndex) - SOUND_FILE_INDEX_DIFF}.wav`}
         onLoadedData={handleSoundLoaded}
         preload="auto"

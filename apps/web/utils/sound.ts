@@ -1,7 +1,7 @@
 // Legacy, we dont use as its not working on iPhones
 
 import * as Tone from "tone";
-import { stringToNoteId } from "./utils";
+import { stringToNoteId } from "@tuning/shared/utils";
 
 let sampler: Tone.Sampler;
 let isLoaded = false;
