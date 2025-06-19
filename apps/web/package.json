@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@netlify/functions": "2.6.0",
+    "@swc/helpers": "^0.5.17",
     "next": "14.2.1",
     "react": "18",
     "react-dom": "18",

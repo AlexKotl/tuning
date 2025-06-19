@@ -15,7 +15,8 @@
     "dev:web": "turbo run dev --filter=web",
     "dev:native": "turbo run dev --filter=native",
     "dev:shared": "turbo run dev --filter=@tuning/shared",
-    "build:web": "turbo run build --filter=web"
+    "build:web": "turbo run build --filter=web",
+    "preview:web": "turbo run start --filter=web"
   },
   "devDependencies": {
     "turbo": "2.5.4"
