@@ -4,9 +4,9 @@ targetPort=4000
 
 [build]
   base = "apps/web"
-  publish = "apps/web/.next"
+  publish = ".next"
   command = "npm run build"
-  functions = "apps/web/netlify/functions"
+  functions = "netlify/functions"
 
 [[redirects]]
   from = "/api/*"
