@@ -26,18 +26,12 @@ const handler = async (req: Request, context: Context) => {
     SONGSTERR_API_URL + songsterrParams.toString()
   );
 
-  const corsResponse = new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers: {
-      ...Object.fromEntries(response.headers.entries()),
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+  const res = new Response(response.body)
+  res.headers.set("Access-Control-Allow-Origin", "*");
+  res.headers.append("Access-Control-Allow-Headers", "*");
+  res.headers.append("Access-Control-Allow-Methods", "*");
 
-  return corsResponse;
+  return res;
 };
 
 export default handler;
