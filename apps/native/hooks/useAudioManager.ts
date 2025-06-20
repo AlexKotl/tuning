@@ -187,7 +187,6 @@ export const useAudioManager = (tuning: TuningState) => {
             const { sound } = await Audio.Sound.createAsync(
               soundFile,
               { shouldPlay: false },
-              onPlaybackStatusUpdate
             );
             
             newSoundObjects[stringKey] = sound;
@@ -210,12 +209,6 @@ export const useAudioManager = (tuning: TuningState) => {
       console.error('Error loading sounds:', error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const onPlaybackStatusUpdate = (status: any) => {
-    if (status.isLoaded) {
-      console.log('Playback status:', status.positionMillis, status.durationMillis);
     }
   };
 

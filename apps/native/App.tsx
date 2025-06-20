@@ -1,8 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, Modal, FlatList, ScrollView, Switch } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Modal, FlatList, ScrollView, Switch, ActivityIndicator, Linking } from 'react-native';
 import { useState, useEffect } from 'react';
-import { useTuning, tuningVariants } from '@tuning/shared';
+import { useTuning, tuningVariants, stringToNoteId } from '@tuning/shared';
 import { useAudioManager } from './hooks/useAudioManager';
+import { getSongsFromClient, type SongsterrSong } from '@tuning/shared/api';
 
 type TuningState = {
   string6: string;
@@ -19,6 +20,11 @@ export default function App() {
   const [isPickerVisible, setIsPickerVisible] = useState(false);
   const [activeString, setActiveString] = useState<string>('');
   const [tuning, setTuning] = useState<TuningState>(defaultTuning);
+  
+  // Song search states
+  const [isSongsModalVisible, setIsSongsModalVisible] = useState(false);
+  const [songs, setSongs] = useState<SongsterrSong[]>([]);
+  const [isLoadingSongs, setIsLoadingSongs] = useState(false);
 
   const { 
     soundStatus, 
@@ -56,6 +62,52 @@ export default function App() {
     };
     
     setTuning(newTuning);
+  };
+
+  const fetchSongs = async () => {
+    setIsLoadingSongs(true);
+    setSongs([]);
+    setIsSongsModalVisible(true);
+
+    try {
+      const tuningArray = [
+        tuning.string1,
+        tuning.string2,
+        tuning.string3,
+        tuning.string4,
+        tuning.string5,
+        tuning.string6
+      ];
+
+      const songs = await getSongsFromClient({
+        tuning: tuningArray
+          .map((note, index) => stringToNoteId(note, index))
+          .join(","),
+        size: 50,
+        from: 0,
+      });
+
+      setSongs(songs);
+    } catch (e) {
+      console.error('Error fetching songs:', e);
+    }
+
+    setIsLoadingSongs(false);
+  };
+
+  const openSongInBrowser = async (songId: number) => {
+    try {
+      const url = `https://www.songsterr.com/a/wsa/SONG-tab-s${songId}`;
+      const supported = await Linking.canOpenURL(url);
+      
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        console.log("Can't open URL:", url);
+      }
+    } catch (error) {
+      console.error('Error opening URL:', error);
+    }
   };
 
   useEffect(() => {
@@ -153,6 +205,71 @@ export default function App() {
           thumbColor={continuousPlayMode ? '#fff' : '#ccc'}
         />
       </View>
+
+      <TouchableOpacity
+        style={styles.searchButton}
+        onPress={fetchSongs}
+        disabled={isLoadingSongs}
+      >
+        <Text style={styles.searchButtonText}>
+          Search songs with {Object.values(tuning).join("-")} tuning
+        </Text>
+      </TouchableOpacity>
+      
+      {/* Songs Modal */}
+      <Modal
+        visible={isSongsModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsSongsModalVisible(false)}
+      >
+        <View style={styles.songsModalOverlay}>
+          <View style={styles.songsModalContent}>
+            <View style={styles.songsModalHeader}>
+              <Text style={styles.songsModalTitle}>Songs with this tuning</Text>
+              <Text style={styles.songsModalTitle}>Found: {songs.length}</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setIsSongsModalVisible(false)}
+              >
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            
+            {isLoadingSongs ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#FFA500" />
+                <Text style={styles.loadingText}>Loading songs...</Text>
+              </View>
+            ) : songs.length > 0 ? (
+              <FlatList
+                data={songs}
+                keyExtractor={(item) => item.songId.toString()}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.songItem}
+                    onPress={() => openSongInBrowser(item.songId)}
+                  >
+                    <View style={styles.songInfo}>
+                      <Text style={styles.songArtist}>{item.artist}</Text>
+                      <Text style={styles.songTitle}>{item.title}</Text>
+                      <Text style={styles.songViews}>
+                        {item.tracks[item.defaultTrack]?.views || 0} views
+                      </Text>
+                    </View>
+                    <Text style={styles.songArrow}>→</Text>
+                  </TouchableOpacity>
+                )}
+                style={styles.songsList}
+              />
+            ) : (
+              <View style={styles.noSongsContainer}>
+                <Text style={styles.noSongsText}>No songs found with this tuning</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
       
       <StatusBar style="auto" />
     </View>
@@ -317,6 +434,102 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   continuousPlayLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  searchButton: {
+    backgroundColor: '#FFA500',
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  searchButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  songsModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  songsModalContent: {
+    backgroundColor: '#2d2d2d',
+    borderRadius: 12,
+    padding: 20,
+    width: '80%',
+    maxHeight: '60%',
+  },
+  songsModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  songsModalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  closeButton: {
+    padding: 5,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  loadingText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginLeft: 10,
+  },
+  songsList: {
+    flex: 1,
+  },
+  songItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  songInfo: {
+    flex: 1,
+  },
+  songArtist: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  songTitle: {
+    fontSize: 14,
+    color: '#cccccc',
+  },
+  songViews: {
+    fontSize: 12,
+    color: '#cccccc',
+  },
+  songArrow: {
+    fontSize: 16,
+    color: '#ffffff',
+  },
+  noSongsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noSongsText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#ffffff',
