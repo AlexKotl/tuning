@@ -3,7 +3,10 @@ port = 8888 # The port that the netlify dev will be accessible on
 targetPort=4000
 
 [build]
-  functions = "netlify/functions"
+  base = "apps/web"
+  publish = "apps/web/.next"
+  command = "npm run build"
+  functions = "apps/web/netlify/functions"
 
 [[redirects]]
   from = "/api/*"

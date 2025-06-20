@@ -3,8 +3,6 @@ import type { Context } from "@netlify/functions";
 export const SONGSTERR_API_URL = "https://www.songsterr.com/api/songs?";
 
 const handler = async (req: Request, context: Context) => {
-  console.log("req", req.url);
-  
   const url = new URL(req.url);
   const searchParams = url.searchParams;
   
@@ -28,7 +26,18 @@ const handler = async (req: Request, context: Context) => {
     SONGSTERR_API_URL + songsterrParams.toString()
   );
 
-  return new Response(response.body);
+  const corsResponse = new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: {
+      ...Object.fromEntries(response.headers.entries()),
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+
+  return corsResponse;
 };
 
 export default handler;
