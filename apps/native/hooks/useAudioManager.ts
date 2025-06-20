@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Audio } from 'expo-av';
 import { stringToNoteId } from '@tuning/shared';
 
 const SOUND_FILE_INDEX_DIFF = 8;
+const CONTINUOUS_PLAY_INTERVAL = 2000;
 
 // Static mapping of all available piano sound files
 // Only including files that actually exist in the assets directory
@@ -93,9 +94,12 @@ export const useAudioManager = (tuning: TuningState) => {
   const [isAudioReady, setIsAudioReady] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [soundStatus, setSoundStatus] = useState<{ [key: string]: boolean }>({});
+  const [continuousPlayMode, setContinuousPlayMode] = useState(false);
+  const [playingStrings, setPlayingStrings] = useState<{ [key: string]: boolean }>({});
 
   // Use refs to store Sound objects for better performance
   const soundObjectsRef = useRef<{ [key: string]: Audio.Sound }>({});
+  const intervalRefs = useRef<{ [key: string]: NodeJS.Timeout }>({});
 
   useEffect(() => {
     setupAudio();
@@ -133,10 +137,19 @@ export const useAudioManager = (tuning: TuningState) => {
 
   const cleanupSounds = async () => {
     try {
+      // Clear all continuous play intervals
+      Object.values(intervalRefs.current).forEach(interval => {
+        if (interval) {
+          clearInterval(interval);
+        }
+      });
+      intervalRefs.current = {};
+      
       const sounds = Object.values(soundObjectsRef.current);
       await Promise.all(sounds.map(sound => sound?.unloadAsync()));
       soundObjectsRef.current = {};
       setSoundStatus({});
+      setPlayingStrings({});
     } catch (error) {
       console.error('Error cleaning up sounds:', error);
     }
@@ -216,13 +229,54 @@ export const useAudioManager = (tuning: TuningState) => {
         return;
       }
 
-      // Stop all other sounds first
-      await stopAllSounds(stringKey);
-
-      // Reset and play the sound
-      await sound.setPositionAsync(0);
-      await sound.playAsync();
-      console.log(`Sound started playing for ${stringKey}`);
+      if (continuousPlayMode) {
+        // Continuous play mode - toggle on/off
+        const isCurrentlyPlaying = playingStrings[stringKey];
+        
+        if (isCurrentlyPlaying) {
+          // Stop continuous play for this string
+          const interval = intervalRefs.current[stringKey];
+          if (interval) {
+            clearInterval(interval);
+            delete intervalRefs.current[stringKey];
+          }
+          await sound.stopAsync();
+          setPlayingStrings(prev => ({ ...prev, [stringKey]: false }));
+          console.log(`Stopped continuous play for ${stringKey}`);
+        } else {
+          // Start continuous play for this string - stop all other sounds first
+          // Clear all existing intervals first
+          Object.entries(intervalRefs.current).forEach(([key, interval]) => {
+            if (interval) {
+              clearInterval(interval);
+            }
+          });
+          intervalRefs.current = {};
+          
+          await stopAllSounds();
+          await sound.setPositionAsync(0);
+          await sound.playAsync();
+          
+          // Set up interval to replay the sound
+          const interval = setInterval(async () => {
+            try {
+              await sound.setPositionAsync(0);
+              await sound.playAsync();
+            } catch (error) {
+              console.error(`Error in continuous play for ${stringKey}:`, error);
+            }
+          }, CONTINUOUS_PLAY_INTERVAL); // Replay every 2 seconds
+          
+          intervalRefs.current[stringKey] = interval;
+          setPlayingStrings(prev => ({ [stringKey]: true })); // Reset to only this string
+          console.log(`Started continuous play for ${stringKey}`);
+        }
+      } else {
+        await stopAllSounds();
+        await sound.setPositionAsync(0);
+        await sound.playAsync();
+        console.log(`Sound started playing for ${stringKey}`);
+      }
     } catch (error) {
       console.error('Error playing sound:', error);
     }
@@ -241,11 +295,40 @@ export const useAudioManager = (tuning: TuningState) => {
     }
   };
 
+  const stopAllContinuousPlay = useCallback(async () => {
+    try {
+      // Clear all continuous play intervals
+      Object.entries(intervalRefs.current).forEach(([stringKey, interval]) => {
+        if (interval) {
+          clearInterval(interval);
+        }
+      });
+      intervalRefs.current = {};
+      
+      // Stop all sounds
+      const sounds = Object.values(soundObjectsRef.current);
+      await Promise.all(sounds.map(sound => sound?.stopAsync()));
+      
+      setPlayingStrings({});
+      console.log('Stopped all continuous play');
+    } catch (error) {
+      console.error('Error stopping continuous play:', error);
+    }
+  }, []);
+
+  const setContinuousPlayModeCallback = useCallback((value: boolean) => {
+    setContinuousPlayMode(value);
+  }, []);
+
   return {
     isAudioReady,
     isLoading,
     soundStatus,
+    continuousPlayMode,
+    playingStrings,
     playStringNote,
+    setContinuousPlayMode: setContinuousPlayModeCallback,
+    stopAllContinuousPlay,
     loadSounds,
     cleanupSounds,
   };

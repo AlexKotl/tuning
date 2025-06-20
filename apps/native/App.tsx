@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, Modal, FlatList, ScrollView } from 'react-native';
-import { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, Modal, FlatList, ScrollView, Switch } from 'react-native';
+import { useState, useEffect } from 'react';
 import { useTuning, tuningVariants } from '@tuning/shared';
 import { useAudioManager } from './hooks/useAudioManager';
 
@@ -20,8 +20,14 @@ export default function App() {
   const [activeString, setActiveString] = useState<string>('');
   const [tuning, setTuning] = useState<TuningState>(defaultTuning);
 
-  // Use the audio manager hook
-  const { soundStatus, playStringNote } = useAudioManager(tuning);
+  const { 
+    soundStatus, 
+    playStringNote, 
+    continuousPlayMode, 
+    playingStrings, 
+    setContinuousPlayMode,
+    stopAllContinuousPlay
+  } = useAudioManager(tuning);
 
   const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
   const stringLabels = ['String 6', 'String 5', 'String 4', 'String 3', 'String 2', 'String 1'];
@@ -52,11 +58,16 @@ export default function App() {
     setTuning(newTuning);
   };
 
+  useEffect(() => {
+    if (!continuousPlayMode) {
+      stopAllContinuousPlay();
+    }
+  }, [continuousPlayMode]);
+
   return (
     <View style={styles.container}>
-      {/* Tuning Variants Buttons */}
       <View style={styles.variantsContainer}>
-        <Text style={styles.variantsTitle}>Quick Tuning Presets</Text>
+        <Text style={styles.variantsTitle}>Tuning Presets</Text>
         <ScrollView 
           horizontal 
           showsHorizontalScrollIndicator={false}
@@ -81,13 +92,14 @@ export default function App() {
             <TouchableOpacity 
               style={[
                 styles.musicIcon,
-                !soundStatus[stringKey] && styles.musicIconDisabled
+                !soundStatus[stringKey] && styles.musicIconDisabled,
+                playingStrings[stringKey] && styles.musicIconPlaying
               ]}
               onPress={() => playStringNote(stringKey)}
               disabled={!soundStatus[stringKey]}
             >
               <Text style={styles.musicIconText}>
-                {soundStatus[stringKey] ? '♪' : '⋯'}
+                {soundStatus[stringKey] ? (playingStrings[stringKey] ? '🔊' : '♪') : '⋯'}
               </Text>
             </TouchableOpacity>
             <View style={styles.pickerContainer}>
@@ -131,6 +143,17 @@ export default function App() {
           </View>
         </TouchableOpacity>
       </Modal>
+      
+      <View style={styles.continuousPlayContainer}>
+        <Text style={styles.continuousPlayLabel}>Continuous play</Text>
+        <Switch
+          value={continuousPlayMode}
+          onValueChange={setContinuousPlayMode}
+          trackColor={{ false: '#444', true: '#FFA500' }}
+          thumbColor={continuousPlayMode ? '#fff' : '#ccc'}
+        />
+      </View>
+      
       <StatusBar style="auto" />
     </View>
   );
@@ -139,7 +162,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#1a1a1a',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
@@ -149,7 +172,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    paddingHorizontal: 10,
+    paddingHorizontal: 0,
   },
   stringContainer: {
     alignItems: 'center',
@@ -174,6 +197,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
+    color: '#ffffff',
   },
   pickerContainer: {
     alignItems: 'center',
@@ -182,37 +206,38 @@ const styles = StyleSheet.create({
   pickerButton: {
     width: '100%',
     height: 40,
-    backgroundColor: 'white',
+    backgroundColor: '#2d2d2d',
     borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#444',
   },
   pickerText: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#ffffff',
   },
   dropdownArrow: {
     fontSize: 12,
-    color: '#666',
+    color: '#cccccc',
   },
   stringLabel: {
     fontSize: 12,
-    color: '#666',
+    color: '#cccccc',
     marginTop: 5,
     textAlign: 'center',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: '#2d2d2d',
     borderRadius: 12,
     padding: 20,
     width: '80%',
@@ -223,34 +248,37 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 15,
+    color: '#ffffff',
   },
   noteOption: {
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#444',
   },
   noteOptionText: {
     fontSize: 16,
     textAlign: 'center',
+    color: '#ffffff',
   },
   variantsContainer: {
     width: '100%',
-    marginBottom: 20,
+    marginBottom: 40,
   },
   variantsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#ffffff',
   },
   variantsScrollContent: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 0,
   },
   variantButton: {
-    backgroundColor: 'white',
+    backgroundColor: '#2d2d2d',
     padding: 12,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#444',
     borderRadius: 8,
     marginRight: 10,
     minWidth: 80,
@@ -260,22 +288,37 @@ const styles = StyleSheet.create({
       width: 0,
       height: 1,
     },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 2,
     elevation: 2,
   },
   variantTitle: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#ffffff',
     marginBottom: 4,
   },
   variantTuning: {
     fontSize: 11,
-    color: '#666',
+    color: '#cccccc',
     textAlign: 'center',
   },
   musicIconDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#555',
+  },
+  musicIconPlaying: {
+    backgroundColor: '#FFF500',
+  },
+  continuousPlayContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingVertical: 20,
+  },
+  continuousPlayLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ffffff',
   },
 });
