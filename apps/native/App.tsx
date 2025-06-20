@@ -71,15 +71,15 @@ export default function App() {
 
     try {
       const tuningArray = [
-        tuning.string1,
-        tuning.string2,
-        tuning.string3,
-        tuning.string4,
+        tuning.string6,
         tuning.string5,
-        tuning.string6
+        tuning.string4,
+        tuning.string3,
+        tuning.string2,
+        tuning.string1,
       ];
 
-      const songs = await getSongsFromClient({
+      const songsResponse = await getSongsFromClient({
         tuning: tuningArray
           .map((note, index) => stringToNoteId(note, index))
           .join(","),
@@ -87,7 +87,8 @@ export default function App() {
         from: 0,
       });
 
-      setSongs(songs);
+      console.log('Songs loaded:', songsResponse.length);
+      setSongs(songsResponse);
     } catch (e) {
       console.error('Error fetching songs:', e);
     }
@@ -102,9 +103,7 @@ export default function App() {
       
       if (supported) {
         await Linking.openURL(url);
-      } else {
-        console.log("Can't open URL:", url);
-      }
+      } 
     } catch (error) {
       console.error('Error opening URL:', error);
     }
@@ -227,7 +226,7 @@ export default function App() {
           <View style={styles.songsModalContent}>
             <View style={styles.songsModalHeader}>
               <Text style={styles.songsModalTitle}>Songs with this tuning</Text>
-              <Text style={styles.songsModalTitle}>Found: {songs.length}</Text>
+              <Text style={styles.songsModalCount}>{songs.length} songs</Text>
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => setIsSongsModalVisible(false)}
@@ -242,26 +241,35 @@ export default function App() {
                 <Text style={styles.loadingText}>Loading songs...</Text>
               </View>
             ) : songs.length > 0 ? (
-              <FlatList
-                data={songs}
-                keyExtractor={(item) => item.songId.toString()}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    style={styles.songItem}
-                    onPress={() => openSongInBrowser(item.songId)}
-                  >
-                    <View style={styles.songInfo}>
-                      <Text style={styles.songArtist}>{item.artist}</Text>
-                      <Text style={styles.songTitle}>{item.title}</Text>
-                      <Text style={styles.songViews}>
-                        {item.tracks[item.defaultTrack]?.views || 0} views
-                      </Text>
+              <View style={styles.songsListContainer}>
+                <FlatList
+                  data={songs}
+                  keyExtractor={(item) => item.songId.toString()}
+                  renderItem={({ item }) => {
+                    console.log('Rendering song:', item.title);
+                    return (
+                      <TouchableOpacity
+                        style={styles.songItem}
+                        onPress={() => openSongInBrowser(item.songId)}
+                      >
+                        <View style={styles.songInfo}>
+                          <Text style={styles.songArtist}>{item.artist}</Text>
+                          <Text style={styles.songTitle}>{item.title}</Text>
+                          <Text style={styles.songViews}>
+                            {item.tracks[item.defaultTrack]?.views || 0} views
+                          </Text>
+                        </View>
+                        <Text style={styles.songArrow}>→</Text>
+                      </TouchableOpacity>
+                    );
+                  }}
+                  ListEmptyComponent={() => (
+                    <View style={styles.noSongsContainer}>
+                      <Text style={styles.noSongsText}>Debug: FlatList is empty</Text>
                     </View>
-                    <Text style={styles.songArrow}>→</Text>
-                  </TouchableOpacity>
-                )}
-                style={styles.songsList}
-              />
+                  )}
+                />
+              </View>
             ) : (
               <View style={styles.noSongsContainer}>
                 <Text style={styles.noSongsText}>No songs found with this tuning</Text>
@@ -460,8 +468,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#2d2d2d',
     borderRadius: 12,
     padding: 20,
-    width: '80%',
-    maxHeight: '60%',
+    width: '90%',
+    maxHeight: '70%',
+    flex: 1,
+    flexDirection: 'column',
   },
   songsModalHeader: {
     flexDirection: 'row',
@@ -474,6 +484,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#ffffff',
   },
+  songsModalCount: {
+    fontSize: 14,
+    color: '#cccccc',
+  },
   closeButton: {
     padding: 5,
   },
@@ -483,10 +497,10 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   loadingContainer: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
   },
   loadingText: {
     fontSize: 16,
@@ -494,8 +508,10 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     marginLeft: 10,
   },
-  songsList: {
+  songsListContainer: {
     flex: 1,
+    marginTop: 10,
+    minHeight: 200,
   },
   songItem: {
     padding: 15,
