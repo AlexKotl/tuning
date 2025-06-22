@@ -82,11 +82,6 @@ export const SongsModal: React.FC<SongsModalProps> = ({
                       <Text style={styles.songArrow}>→</Text>
                     </TouchableOpacity>
                 }
-                ListEmptyComponent={() => (
-                  <View style={styles.noSongsContainer}>
-                    <Text style={styles.noSongsText}>Debug: FlatList is empty</Text>
-                  </View>
-                )}
               />
             </View>
           ) : (
