@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- Avoid using excessive comments
+- Name boolean variables with prefix *is*, *has*, etc.
+- Split heavy components into smaller chunks, use hooks where needed

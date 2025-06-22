@@ -214,8 +214,6 @@ export const useAudioManager = (tuning: TuningState) => {
 
   const playStringNote = async (stringKey: string) => {
     try {
-      console.log(`Attempting to play sound for ${stringKey}`);
-      
       const sound = soundObjectsRef.current[stringKey];
       if (!sound) {
         console.warn(`No sound object found for ${stringKey}`);
@@ -235,7 +233,6 @@ export const useAudioManager = (tuning: TuningState) => {
           }
           await sound.stopAsync();
           setPlayingStrings(prev => ({ ...prev, [stringKey]: false }));
-          console.log(`Stopped continuous play for ${stringKey}`);
         } else {
           // Start continuous play for this string - stop all other sounds first
           // Clear all existing intervals first
@@ -262,13 +259,11 @@ export const useAudioManager = (tuning: TuningState) => {
           
           intervalRefs.current[stringKey] = interval;
           setPlayingStrings(prev => ({ [stringKey]: true })); // Reset to only this string
-          console.log(`Started continuous play for ${stringKey}`);
         }
       } else {
         await stopAllSounds();
         await sound.setPositionAsync(0);
         await sound.playAsync();
-        console.log(`Sound started playing for ${stringKey}`);
       }
     } catch (error) {
       console.error('Error playing sound:', error);

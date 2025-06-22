@@ -21,7 +21,6 @@ export default function App() {
   const [activeString, setActiveString] = useState<string>('');
   const [tuning, setTuning] = useState<TuningState>(defaultTuning);
   
-  // Song search states
   const [isSongsModalVisible, setIsSongsModalVisible] = useState(false);
   const [songs, setSongs] = useState<SongsterrSong[]>([]);
   const [isLoadingSongs, setIsLoadingSongs] = useState(false);
@@ -53,12 +52,12 @@ export default function App() {
 
   const applyTuningVariant = (tuningVariant: string[]) => {
     const newTuning: TuningState = {
-      string6: tuningVariant[0],
-      string5: tuningVariant[1],
-      string4: tuningVariant[2],
-      string3: tuningVariant[3],
-      string2: tuningVariant[4],
-      string1: tuningVariant[5],
+      string6: tuningVariant[5],
+      string5: tuningVariant[4],
+      string4: tuningVariant[3],
+      string3: tuningVariant[2],
+      string2: tuningVariant[1],
+      string1: tuningVariant[0],
     };
     
     setTuning(newTuning);
@@ -71,12 +70,12 @@ export default function App() {
 
     try {
       const tuningArray = [
-        tuning.string6,
-        tuning.string5,
-        tuning.string4,
-        tuning.string3,
-        tuning.string2,
         tuning.string1,
+        tuning.string2,
+        tuning.string3,
+        tuning.string4,
+        tuning.string5,
+        tuning.string6,
       ];
 
       const songsResponse = await getSongsFromClient({
@@ -131,7 +130,7 @@ export default function App() {
               onPress={() => applyTuningVariant(variant.tuning)}
             >
               <Text style={styles.variantTitle}>{variant.title}</Text>
-              <Text style={styles.variantTuning}>{variant.tuning.join(' ')}</Text>
+              <Text style={styles.variantTuning}>{variant.tuning.slice().reverse().join(' ')}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -245,9 +244,7 @@ export default function App() {
                 <FlatList
                   data={songs}
                   keyExtractor={(item) => item.songId.toString()}
-                  renderItem={({ item }) => {
-                    console.log('Rendering song:', item.title);
-                    return (
+                  renderItem={({ item }) => 
                       <TouchableOpacity
                         style={styles.songItem}
                         onPress={() => openSongInBrowser(item.songId)}
@@ -261,8 +258,7 @@ export default function App() {
                         </View>
                         <Text style={styles.songArrow}>→</Text>
                       </TouchableOpacity>
-                    );
-                  }}
+                  }
                   ListEmptyComponent={() => (
                     <View style={styles.noSongsContainer}>
                       <Text style={styles.noSongsText}>Debug: FlatList is empty</Text>
@@ -452,6 +448,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 20,
     marginBottom: 10,
+    width: '100%',
   },
   searchButtonText: {
     fontSize: 16,
