@@ -2,8 +2,10 @@ local constants = import "constants"
 local utils = import "utils"
 
 local currentTuning = constants.tuningVariants[1].tuning
+
+
 local selectedString = 1
-local isEditing = false
+local soundPlayer = nil
 
 local squareSize = 30
 local squareSpacing = 35
@@ -13,6 +15,30 @@ local startY = 60
 local selectedColor = playdate.graphics.kColorBlack
 local unselectedColor = playdate.graphics.kColorWhite
 local borderColor = playdate.graphics.kColorBlack
+
+-- Constants for sound file naming (same as web app)
+local SOUND_FILE_INDEX_DIFF = 8
+
+function playStringNote()
+    -- Stop any currently playing sound
+    if soundPlayer then
+        soundPlayer:stop()
+    end
+
+    -- Calculate the sound file index using the same logic as web app
+    local actualIndex = 6 - selectedString
+    local noteId = utils.stringToNoteId(currentTuning[actualIndex], actualIndex)
+    local soundFileIndex = noteId - SOUND_FILE_INDEX_DIFF
+
+    -- Format the filename with leading zeros
+    local filename = string.format("sounds/piano/piano-ff-%03d.wav", soundFileIndex)
+
+    -- Load and play the sound
+    soundPlayer = playdate.sound.sampleplayer.new(filename)
+    if soundPlayer then
+        soundPlayer:play()
+    end
+end
 
 function playdate.update()
     playdate.graphics.clear()
@@ -53,35 +79,17 @@ function playdate.update()
         playdate.graphics.drawText(currentTuning[i], x + 8, y + 18)
     end
 
-    playdate.graphics.drawText("A: Select string", 10, 200)
+    playdate.graphics.drawText("A: Play note", 10, 200)
     playdate.graphics.drawText("B: Change note", 10, 215)
     playdate.graphics.drawText("D-pad: Navigate", 10, 230)
 end
 
 function playdate.AButtonDown()
-    isEditing = not isEditing
-    if isEditing then
-        playdate.graphics.drawText("Editing string " .. selectedString, 10, 180)
-    end
+    playStringNote()
 end
 
 function playdate.BButtonDown()
-    if isEditing then
-        local currentNoteIndex = 1
-        for i, note in ipairs(constants.notesVariants) do
-            if note == currentTuning[selectedString] then
-                currentNoteIndex = i
-                break
-            end
-        end
 
-        currentNoteIndex = currentNoteIndex + 1
-        if currentNoteIndex > #constants.notesVariants then
-            currentNoteIndex = 1
-        end
-
-        currentTuning[selectedString] = constants.notesVariants[currentNoteIndex]
-    end
 end
 
 function playdate.leftButtonDown()
