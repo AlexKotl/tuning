@@ -103,7 +103,10 @@ function playdate.update()
         drawRoundedButton(x, y, squareSize, squareSize, fillColor, borderColor, isSelected)
 
         -- Draw string number with better positioning
-        playdate.graphics.setColor(isSelected and unselectedColor or selectedColor)
+        -- playdate.graphics.setColor(isSelected and unselectedColor or selectedColor)
+        if isSelected then
+            playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeFillWhite)
+        end
         local numberX = x + (squareSize - playdate.graphics.getTextSize(tostring(i))) / 2
         playdate.graphics.drawText(tostring(i), numberX, y + 8)
 
@@ -111,6 +114,7 @@ function playdate.update()
         local noteText = currentTuning[i]
         local noteX = x + (squareSize - playdate.graphics.getTextSize(noteText)) / 2
         playdate.graphics.drawText(noteText, noteX, y + 22)
+        playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeCopy)
     end
 
     -- Enhanced instructions with better spacing
