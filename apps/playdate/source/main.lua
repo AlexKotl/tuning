@@ -1,6 +1,8 @@
 local constants = import "constants"
 local utils = import "utils"
 
+local gfx = playdate.graphics
+
 local currentTuning = constants.tuningVariants[1].tuning
 
 local selectedString = 1
@@ -15,10 +17,10 @@ local cornerRadius = 6  -- Rounded corners
 local shadowOffset = 2  -- Shadow effect
 
 -- Enhanced color scheme
-local selectedColor = playdate.graphics.kColorBlack
-local unselectedColor = playdate.graphics.kColorWhite
-local borderColor = playdate.graphics.kColorBlack
-local highlightColor = playdate.graphics.kColorWhite
+local selectedColor = gfx.kColorBlack
+local unselectedColor = gfx.kColorWhite
+local borderColor = gfx.kColorBlack
+local highlightColor = gfx.kColorWhite
 
 -- Constants for sound file naming (same as web app)
 local SOUND_FILE_INDEX_DIFF = 8
@@ -29,21 +31,21 @@ function drawRoundedButton(x, y, width, height, fillColor, borderColor, isSelect
     local shadowY = y + shadowOffset
 
     -- Draw shadow
-    playdate.graphics.setColor(borderColor)
-    playdate.graphics.fillRoundRect(shadowX, shadowY, width, height, cornerRadius)
+    gfx.setColor(borderColor)
+    gfx.fillRoundRect(shadowX, shadowY, width, height, cornerRadius)
 
     -- Draw main button
-    playdate.graphics.setColor(fillColor)
-    playdate.graphics.fillRoundRect(x, y, width, height, cornerRadius)
+    gfx.setColor(fillColor)
+    gfx.fillRoundRect(x, y, width, height, cornerRadius)
 
     -- Draw border
-    playdate.graphics.setColor(borderColor)
-    playdate.graphics.drawRoundRect(x, y, width, height, cornerRadius)
+    gfx.setColor(borderColor)
+    gfx.drawRoundRect(x, y, width, height, cornerRadius)
 
     -- Add highlight effect for selected button
     if isSelected then
-        playdate.graphics.setColor(highlightColor)
-        playdate.graphics.drawRoundRect(x + 1, y + 1, width - 2, height - 2, cornerRadius - 1)
+        gfx.setColor(highlightColor)
+        gfx.drawRoundRect(x + 1, y + 1, width - 2, height - 2, cornerRadius - 1)
     end
 end
 
@@ -69,11 +71,11 @@ function playStringNote()
 end
 
 function playdate.update()
-    playdate.graphics.clear()
+    gfx.clear()
 
     -- Enhanced title with better positioning
-    playdate.graphics.setFont(playdate.graphics.getFont())
-    playdate.graphics.drawText("Guitar Tuner", 10, 15)
+    gfx.setFont(gfx.getFont())
+    gfx.drawText("Guitar Tuner", 10, 15)
 
     local tuningName = "Standard"
     for i, variant in ipairs(constants.tuningVariants) do
@@ -89,7 +91,7 @@ function playdate.update()
             break
         end
     end
-    playdate.graphics.drawText("Tuning: " .. tuningName, 10, 35)
+    gfx.drawText("Tuning: " .. tuningName, 10, 35)
 
     -- Draw enhanced string buttons
     for i = 1, 6 do
@@ -103,25 +105,25 @@ function playdate.update()
         drawRoundedButton(x, y, squareSize, squareSize, fillColor, borderColor, isSelected)
 
         -- Draw string number with better positioning
-        -- playdate.graphics.setColor(isSelected and unselectedColor or selectedColor)
+        -- gfx.setColor(isSelected and unselectedColor or selectedColor)
         if isSelected then
-            playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeFillWhite)
+            gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
         end
-        local numberX = x + (squareSize - playdate.graphics.getTextSize(tostring(i))) / 2
-        playdate.graphics.drawText(tostring(i), numberX, y + 8)
+        local numberX = x + (squareSize - gfx.getTextSize(tostring(i))) / 2
+        gfx.drawText(tostring(i), numberX, y + 8)
 
         -- Draw note name with better positioning
         local noteText = currentTuning[i]
-        local noteX = x + (squareSize - playdate.graphics.getTextSize(noteText)) / 2
-        playdate.graphics.drawText(noteText, noteX, y + 22)
-        playdate.graphics.setImageDrawMode(playdate.graphics.kDrawModeCopy)
+        local noteX = x + (squareSize - gfx.getTextSize(noteText)) / 2
+        gfx.drawText(noteText, noteX, y + 22)
+        gfx.setImageDrawMode(gfx.kDrawModeCopy)
     end
 
     -- Enhanced instructions with better spacing
-    playdate.graphics.setColor(playdate.graphics.kColorBlack)
-    playdate.graphics.drawText("A: Play note", 10, 210)
-    playdate.graphics.drawText("⬅️➡️ D-pad: Navigate", 10, 225)
-    playdate.graphics.drawText("⬆️⬇️ Change tuning", 10, 240)
+    gfx.setColor(gfx.kColorBlack)
+    gfx.drawText("A: Play note", 10, 210)
+    gfx.drawText("⬅️➡️ D-pad: Navigate", 10, 225)
+    gfx.drawText("⬆️⬇️ Change tuning", 10, 240)
 end
 
 function playdate.AButtonDown()
