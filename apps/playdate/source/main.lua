@@ -3,21 +3,49 @@ local utils = import "utils"
 
 local currentTuning = constants.tuningVariants[1].tuning
 
-
 local selectedString = 1
 local soundPlayer = nil
 
-local squareSize = 30
-local squareSpacing = 35
-local startX = 20
-local startY = 60
+-- Enhanced visual parameters
+local squareSize = 35  -- Slightly larger
+local squareSpacing = 40  -- More spacing
+local startX = 15
+local startY = 70
+local cornerRadius = 6  -- Rounded corners
+local shadowOffset = 2  -- Shadow effect
 
+-- Enhanced color scheme
 local selectedColor = playdate.graphics.kColorBlack
 local unselectedColor = playdate.graphics.kColorWhite
 local borderColor = playdate.graphics.kColorBlack
+local highlightColor = playdate.graphics.kColorWhite
 
 -- Constants for sound file naming (same as web app)
 local SOUND_FILE_INDEX_DIFF = 8
+
+-- Helper function to draw rounded rectangle with shadow
+function drawRoundedButton(x, y, width, height, fillColor, borderColor, isSelected)
+    local shadowX = x + shadowOffset
+    local shadowY = y + shadowOffset
+
+    -- Draw shadow
+    playdate.graphics.setColor(borderColor)
+    playdate.graphics.fillRoundRect(shadowX, shadowY, width, height, cornerRadius)
+
+    -- Draw main button
+    playdate.graphics.setColor(fillColor)
+    playdate.graphics.fillRoundRect(x, y, width, height, cornerRadius)
+
+    -- Draw border
+    playdate.graphics.setColor(borderColor)
+    playdate.graphics.drawRoundRect(x, y, width, height, cornerRadius)
+
+    -- Add highlight effect for selected button
+    if isSelected then
+        playdate.graphics.setColor(highlightColor)
+        playdate.graphics.drawRoundRect(x + 1, y + 1, width - 2, height - 2, cornerRadius - 1)
+    end
+end
 
 function playStringNote()
     -- Stop any currently playing sound
@@ -43,7 +71,9 @@ end
 function playdate.update()
     playdate.graphics.clear()
 
-    playdate.graphics.drawText("Guitar Tuner", 10, 10)
+    -- Enhanced title with better positioning
+    playdate.graphics.setFont(playdate.graphics.getFont())
+    playdate.graphics.drawText("Guitar Tuner", 10, 15)
 
     local tuningName = "Standard"
     for i, variant in ipairs(constants.tuningVariants) do
@@ -59,28 +89,35 @@ function playdate.update()
             break
         end
     end
-    playdate.graphics.drawText("Tuning: " .. tuningName, 10, 30)
+    playdate.graphics.drawText("Tuning: " .. tuningName, 10, 35)
 
+    -- Draw enhanced string buttons
     for i = 1, 6 do
         local x = startX + (i - 1) * squareSpacing
         local y = startY
 
-        local fillColor = (i == selectedString) and selectedColor or unselectedColor
+        local isSelected = (i == selectedString)
+        local fillColor = isSelected and selectedColor or unselectedColor
 
-        playdate.graphics.setColor(fillColor)
-        playdate.graphics.fillRect(x, y, squareSize, squareSize)
+        -- Draw the enhanced button
+        drawRoundedButton(x, y, squareSize, squareSize, fillColor, borderColor, isSelected)
 
-        playdate.graphics.setColor(borderColor)
-        playdate.graphics.drawRect(x, y, squareSize, squareSize)
+        -- Draw string number with better positioning
+        playdate.graphics.setColor(isSelected and unselectedColor or selectedColor)
+        local numberX = x + (squareSize - playdate.graphics.getTextSize(tostring(i))) / 2
+        playdate.graphics.drawText(tostring(i), numberX, y + 8)
 
-        playdate.graphics.setColor(playdate.graphics.kColorBlack)
-        playdate.graphics.drawText(tostring(i), x + 10, y + 8)
-
-        playdate.graphics.drawText(currentTuning[i], x + 8, y + 36)
+        -- Draw note name with better positioning
+        local noteText = currentTuning[i]
+        local noteX = x + (squareSize - playdate.graphics.getTextSize(noteText)) / 2
+        playdate.graphics.drawText(noteText, noteX, y + 22)
     end
 
-    playdate.graphics.drawText("A: Play note", 10, 200)
-    playdate.graphics.drawText("D-pad: Navigate", 10, 215)
+    -- Enhanced instructions with better spacing
+    playdate.graphics.setColor(playdate.graphics.kColorBlack)
+    playdate.graphics.drawText("A: Play note", 10, 210)
+    playdate.graphics.drawText("⬅️➡️ D-pad: Navigate", 10, 225)
+    playdate.graphics.drawText("⬆️⬇️ Change tuning", 10, 240)
 end
 
 function playdate.AButtonDown()
