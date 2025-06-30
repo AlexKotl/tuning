@@ -11,7 +11,7 @@
         "commands": [
             {
                 "match": ".lua",
-                "cmd": "./apps/playdate/build.sh"
+                "cmd": "cd ./apps/playdate && ./build.sh"
             }
         ]
     }

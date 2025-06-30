@@ -76,12 +76,11 @@ function playdate.update()
         playdate.graphics.setColor(playdate.graphics.kColorBlack)
         playdate.graphics.drawText(tostring(i), x + 10, y + 8)
 
-        playdate.graphics.drawText(currentTuning[i], x + 8, y + 18)
+        playdate.graphics.drawText(currentTuning[i], x + 8, y + 36)
     end
 
     playdate.graphics.drawText("A: Play note", 10, 200)
-    playdate.graphics.drawText("B: Change note", 10, 215)
-    playdate.graphics.drawText("D-pad: Navigate", 10, 230)
+    playdate.graphics.drawText("D-pad: Navigate", 10, 215)
 end
 
 function playdate.AButtonDown()
