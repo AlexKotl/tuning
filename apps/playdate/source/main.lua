@@ -87,6 +87,7 @@ function playdate.update()
 
     -- Draw enhanced string buttons
     for i = 1, 6 do
+        gfx.setLineWidth(1)
         local x = startX + (6-i) * squareSpacing
 
         local isSelected = (i == selectedString)
@@ -94,6 +95,9 @@ function playdate.update()
 
         -- Draw the enhanced button
         drawRoundedButton(x, startY + 22, squareSize, squareSize, fillColor, borderColor, isSelected)
+
+        gfx.setLineWidth(i+1)
+        gfx.drawLine(x + 16, startY + 22 + 50, x + 16, startY + 22 + 100)
 
         -- Draw string number with better positioning
         local numberX = x + (squareSize - gfx.getTextSize(tostring(i))) / 2
@@ -107,6 +111,9 @@ function playdate.update()
         local noteX = x + (squareSize - gfx.getTextSize(noteText)) / 2
         gfx.drawText(noteText, noteX, startY + 32)
         gfx.setImageDrawMode(gfx.kDrawModeCopy)
+
+
+
     end
 
     -- Enhanced instructions with better spacing
