@@ -96,34 +96,32 @@ function playdate.update()
     -- Draw enhanced string buttons
     for i = 1, 6 do
         local x = startX + (i - 1) * squareSpacing
-        local y = startY
 
         local isSelected = (i == selectedString)
         local fillColor = isSelected and selectedColor or unselectedColor
 
         -- Draw the enhanced button
-        drawRoundedButton(x, y, squareSize, squareSize, fillColor, borderColor, isSelected)
+        drawRoundedButton(x, startY + 22, squareSize, squareSize, fillColor, borderColor, isSelected)
 
         -- Draw string number with better positioning
-        -- gfx.setColor(isSelected and unselectedColor or selectedColor)
+        local numberX = x + (squareSize - gfx.getTextSize(tostring(i))) / 2
+        gfx.drawText(tostring(i), numberX, startY)
         if isSelected then
             gfx.setImageDrawMode(gfx.kDrawModeFillWhite)
         end
-        local numberX = x + (squareSize - gfx.getTextSize(tostring(i))) / 2
-        gfx.drawText(tostring(i), numberX, y + 8)
 
         -- Draw note name with better positioning
         local noteText = currentTuning[i]
         local noteX = x + (squareSize - gfx.getTextSize(noteText)) / 2
-        gfx.drawText(noteText, noteX, y + 22)
+        gfx.drawText(noteText, noteX, startY + 32)
         gfx.setImageDrawMode(gfx.kDrawModeCopy)
     end
 
     -- Enhanced instructions with better spacing
     gfx.setColor(gfx.kColorBlack)
-    gfx.drawText("A: Play note", 10, 210)
-    gfx.drawText("⬅️➡️ D-pad: Navigate", 10, 225)
-    gfx.drawText("⬆️⬇️ Change tuning", 10, 240)
+    gfx.drawText("A: Play note", 10, 180)
+    gfx.drawText("⬅️➡️ Navigate", 10, 200)
+    gfx.drawText("⬆️⬇️ Change tuning", 10, 220)
 end
 
 function playdate.AButtonDown()
