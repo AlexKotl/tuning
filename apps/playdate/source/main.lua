@@ -5,7 +5,7 @@ local gfx = playdate.graphics
 
 local currentTuning = constants.tuningVariants[1].tuning
 
-local selectedString = 1
+local selectedString = 6
 local soundPlayer = nil
 
 -- Enhanced visual parameters
@@ -23,7 +23,7 @@ local borderColor = gfx.kColorBlack
 local highlightColor = gfx.kColorWhite
 
 -- Constants for sound file naming (same as web app)
-local SOUND_FILE_INDEX_DIFF = 8
+local SOUND_FILE_INDEX_DIFF = 9
 
 -- Helper function to draw rounded rectangle with shadow
 function drawRoundedButton(x, y, width, height, fillColor, borderColor, isSelected)
@@ -50,17 +50,13 @@ function drawRoundedButton(x, y, width, height, fillColor, borderColor, isSelect
 end
 
 function playStringNote()
-    -- Stop any currently playing sound
     if soundPlayer then
         soundPlayer:stop()
     end
 
-    -- Calculate the sound file index using the same logic as web app
-    local actualIndex = 6 - selectedString
-    local noteId = utils.stringToNoteId(currentTuning[actualIndex], actualIndex)
+    -- Calculate the sound file index
+    local noteId = utils.stringToNoteId(currentTuning[selectedString], selectedString)
     local soundFileIndex = noteId - SOUND_FILE_INDEX_DIFF
-
-    -- Format the filename with leading zeros
     local filename = string.format("sounds/piano/piano-ff-%03d.wav", soundFileIndex)
 
     -- Load and play the sound
@@ -72,10 +68,6 @@ end
 
 function playdate.update()
     gfx.clear()
-
-    -- Enhanced title with better positioning
-    gfx.setFont(gfx.getFont())
-    gfx.drawText("Guitar Tuner", 10, 15)
 
     local tuningName = "Standard"
     for i, variant in ipairs(constants.tuningVariants) do
@@ -95,7 +87,7 @@ function playdate.update()
 
     -- Draw enhanced string buttons
     for i = 1, 6 do
-        local x = startX + (i - 1) * squareSpacing
+        local x = startX + (6-i) * squareSpacing
 
         local isSelected = (i == selectedString)
         local fillColor = isSelected and selectedColor or unselectedColor
@@ -120,8 +112,8 @@ function playdate.update()
     -- Enhanced instructions with better spacing
     gfx.setColor(gfx.kColorBlack)
     gfx.drawText("A: Play note", 10, 180)
-    gfx.drawText("⬅️➡️ Navigate", 10, 200)
-    gfx.drawText("⬆️⬇️ Change tuning", 10, 220)
+    gfx.drawText("⬅️➡️: Navigate", 10, 200)
+    gfx.drawText("⬆️⬇️: Change tuning", 10, 220)
 end
 
 function playdate.AButtonDown()
@@ -133,14 +125,15 @@ function playdate.BButtonDown()
 end
 
 function playdate.leftButtonDown()
-    if selectedString > 1 then
-        selectedString = selectedString - 1
+
+    if selectedString < 6 then
+        selectedString = selectedString + 1
     end
 end
 
 function playdate.rightButtonDown()
-    if selectedString < 6 then
-        selectedString = selectedString + 1
+    if selectedString > 1 then
+        selectedString = selectedString - 1
     end
 end
 
