@@ -205,7 +205,7 @@ function playdate.rightButtonDown()
     end
 end
 
-function playdate.upButtonDown()
+function handleTuningChange(direction)
     local currentPreset = 1
     for i, variant in ipairs(constants.tuningVariants) do
         local isMatch = true
@@ -221,34 +221,22 @@ function playdate.upButtonDown()
         end
     end
 
-    currentPreset = currentPreset + 1
+    currentPreset = currentPreset + direction
     if currentPreset > #constants.tuningVariants then
         currentPreset = 1
+    elseif currentPreset < 1 then
+        currentPreset = #constants.tuningVariants
     end
+
+    print(currentPreset)
 
     currentTuning = constants.tuningVariants[currentPreset].tuning
 end
 
+function playdate.upButtonDown()
+    handleTuningChange(-1)
+end
+
 function playdate.downButtonDown()
-    local currentPreset = 1
-    for i, variant in ipairs(constants.tuningVariants) do
-        local isMatch = true
-        for j, note in ipairs(variant.tuning) do
-            if note ~= currentTuning[j] then
-                isMatch = false
-                break
-            end
-        end
-        if isMatch then
-            currentPreset = i
-            break
-        end
-    end
-
-    currentPreset = currentPreset - 1
-    if currentPreset < 1 then
-        currentPreset = #constants.tuningVariants
-    end
-
-    currentTuning = constants.tuningVariants[currentPreset].tuning
+    handleTuningChange(1)
 end
