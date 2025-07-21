@@ -4,7 +4,7 @@ local GuitarString = import "components/guitar-string"
 
 local gfx = playdate.graphics
 
-local fontBigger<const> = gfx.font.new("fonts/Roobert/Roobert-10-Bold")
+local fontBigger<const> = gfx.font.new("fonts/Roobert/Roobert-9-Mono-Condensed")
 
 local currentTuning = constants.tuningVariants[1].tuning
 
@@ -12,6 +12,7 @@ local selectedString = 6
 local soundPlayer = nil
 
 -- Grid display variables
+local showInstructions = false
 local gridStartX = 270
 local gridStartY = 15
 local gridItemWidth = 120
@@ -184,7 +185,9 @@ function playdate.update()
     drawTuningGrid()
     gfx.setFont(playdate.graphics.getSystemFont())
 
-    drawInstructions()
+    if showInstructions then
+        drawInstructions()
+    end
 end
 
 function drawInstructions()
@@ -196,13 +199,17 @@ function drawInstructions()
     gfx.setColor(gfx.kColorBlack)
     gfx.drawRoundRect(startX, startY, frameWidth, 70, 10)
     gfx.setColor(gfx.kColorBlack)
-    gfx.drawText("A: Play note", startX + 10, startY + 7)
+    gfx.drawText("Ⓐ: Play note", startX + 10, startY + 7)
     gfx.drawText("⬅️➡️: Navigate", startX + 10, startY + 27)
     gfx.drawText("⬆️⬇️: Change tuning", startX + 10, startY + 47)
 end
 
 function playdate.AButtonDown()
     playStringNote()
+end
+
+function playdate.BButtonDown()
+    showInstructions = not showInstructions
 end
 
 function playdate.leftButtonDown()

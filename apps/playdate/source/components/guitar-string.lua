@@ -2,7 +2,7 @@ local GuitarString = {}
 GuitarString.__index = GuitarString
 
 local gfx<const> = playdate.graphics
-local STRING_LENGTH = 130
+local STRING_LENGTH = 135
 
 function GuitarString:init(stringSize)
   local newSelf = setmetatable({}, GuitarString)
