@@ -4,10 +4,20 @@ local GuitarString = import "components/guitar-string"
 
 local gfx = playdate.graphics
 
+local fontBigger<const> = gfx.font.new("fonts/Roobert/Roobert-10-Bold")
+-- local fontDefault<const> = gfx.font.new("fonts/Cuberick/font-Cuberick-bold")
+
 local currentTuning = constants.tuningVariants[1].tuning
 
 local selectedString = 6
 local soundPlayer = nil
+
+-- Grid display variables
+local gridStartX = 270
+local gridStartY = 20
+local gridItemWidth = 120
+local gridItemHeight = 40
+local gridSpacing = 5
 
 -- Enhanced visual parameters
 local squareSize = 35  -- Slightly larger
@@ -59,6 +69,44 @@ function drawRoundedButton(x, y, width, height, fillColor, borderColor, isSelect
     end
 end
 
+function drawTuningGridItem(x, y, width, height, tuning, title, isCurrent)
+    gfx.setFont(fontBigger)
+    gfx.setLineWidth(isCurrent and 3 or 1)
+    gfx.setColor(gfx.kColorWhite)
+    gfx.fillRoundRect(x, y, width, height, cornerRadius)
+
+    gfx.setColor(gfx.kColorBlack)
+    gfx.drawRoundRect(x, y, width, height, cornerRadius)
+
+    gfx.setColor(gfx.kColorBlack)
+    local titleX = x + (width - gfx.getTextSize(title)) / 2
+    gfx.drawText(title, titleX, y + 5)
+
+    local notesText = table.concat(tuning, "-")
+    local notesX = x + (width - gfx.getTextSize(notesText)) / 2
+    gfx.drawText(notesText, notesX, y + 22)
+end
+
+function drawTuningGrid()
+    gfx.setColor(gfx.kColorBlack)
+    for i, variant in ipairs(constants.tuningVariants) do
+
+        local x = gridStartX
+        local y = gridStartY + (i-1) * (gridItemHeight + gridSpacing)
+
+        -- Check if this is the current tuning
+        local isCurrent = true
+        for j, note in ipairs(variant.tuning) do
+            if note ~= currentTuning[j] then
+                isCurrent = false
+                break
+            end
+        end
+
+        drawTuningGridItem(x, y, gridItemWidth, gridItemHeight, variant.tuning, variant.title, isCurrent)
+    end
+end
+
 function playStringNote()
     if soundPlayer then
         soundPlayer:stop()
@@ -81,6 +129,7 @@ end
 
 function playdate.update()
     gfx.clear()
+    gfx.setFont(playdate.graphics.getSystemFont())
 
     -- Update all strings for wave animation
     for i = 1, 6 do
@@ -101,6 +150,7 @@ function playdate.update()
             break
         end
     end
+
     gfx.drawText("Tuning: " .. tuningName, 10, 35)
 
     -- Draw enhanced string buttons
@@ -111,7 +161,6 @@ function playdate.update()
         local isSelected = (i == selectedString)
         local fillColor = isSelected and selectedColor or unselectedColor
 
-        -- Draw the enhanced button
         drawRoundedButton(x, startY + 22, squareSize, squareSize, fillColor, borderColor, isSelected)
 
         strings[i]:draw(x + 18, startY + 22 + 37)
@@ -128,10 +177,10 @@ function playdate.update()
         local noteX = x + (squareSize - gfx.getTextSize(noteText)) / 2
         gfx.drawText(noteText, noteX, startY + 32)
         gfx.setImageDrawMode(gfx.kDrawModeCopy)
-
-
-
     end
+
+    drawTuningGrid()
+    gfx.setFont(playdate.graphics.getSystemFont())
 
     -- Enhanced instructions with better spacing
     gfx.setColor(gfx.kColorBlack)
@@ -144,12 +193,7 @@ function playdate.AButtonDown()
     playStringNote()
 end
 
-function playdate.BButtonDown()
-
-end
-
 function playdate.leftButtonDown()
-
     if selectedString < 6 then
         selectedString = selectedString + 1
     end
