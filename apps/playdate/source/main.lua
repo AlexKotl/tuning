@@ -5,7 +5,6 @@ local GuitarString = import "components/guitar-string"
 local gfx = playdate.graphics
 
 local fontBigger<const> = gfx.font.new("fonts/Roobert/Roobert-10-Bold")
--- local fontDefault<const> = gfx.font.new("fonts/Cuberick/font-Cuberick-bold")
 
 local currentTuning = constants.tuningVariants[1].tuning
 
@@ -14,7 +13,7 @@ local soundPlayer = nil
 
 -- Grid display variables
 local gridStartX = 270
-local gridStartY = 20
+local gridStartY = 15
 local gridItemWidth = 120
 local gridItemHeight = 40
 local gridSpacing = 5
@@ -23,7 +22,7 @@ local gridSpacing = 5
 local squareSize = 35  -- Slightly larger
 local squareSpacing = 40  -- More spacing
 local startX = 15
-local startY = 70
+local startY = 50
 local cornerRadius = 6  -- Rounded corners
 local shadowOffset = 2  -- Shadow effect
 
@@ -71,7 +70,7 @@ end
 
 function drawTuningGridItem(x, y, width, height, tuning, title, isCurrent)
     gfx.setFont(fontBigger)
-    gfx.setLineWidth(isCurrent and 3 or 1)
+    gfx.setLineWidth(isCurrent and 2 or 1)
     gfx.setColor(gfx.kColorWhite)
     gfx.fillRoundRect(x, y, width, height, cornerRadius)
 
@@ -82,7 +81,11 @@ function drawTuningGridItem(x, y, width, height, tuning, title, isCurrent)
     local titleX = x + (width - gfx.getTextSize(title)) / 2
     gfx.drawText(title, titleX, y + 5)
 
-    local notesText = table.concat(tuning, "-")
+    local reversedTuning = {}
+    for i = #tuning, 1, -1 do
+        table.insert(reversedTuning, tuning[i])
+    end
+    local notesText = table.concat(reversedTuning, "-")
     local notesX = x + (width - gfx.getTextSize(notesText)) / 2
     gfx.drawText(notesText, notesX, y + 22)
 end
@@ -151,9 +154,8 @@ function playdate.update()
         end
     end
 
-    gfx.drawText("Tuning: " .. tuningName, 10, 35)
+    gfx.drawText("Tuning: " .. tuningName, startX, 15)
 
-    -- Draw enhanced string buttons
     for i = 1, 6 do
         gfx.setLineWidth(1)
         local x = startX + (6-i) * squareSpacing
@@ -182,11 +184,21 @@ function playdate.update()
     drawTuningGrid()
     gfx.setFont(playdate.graphics.getSystemFont())
 
-    -- Enhanced instructions with better spacing
+    drawInstructions()
+end
+
+function drawInstructions()
+    local startX = 40
+    local startY = 165
+    local frameWidth = 185
+    gfx.setColor(gfx.kColorWhite)
+    gfx.fillRoundRect(startX, startY, frameWidth, 70, 10)
     gfx.setColor(gfx.kColorBlack)
-    gfx.drawText("A: Play note", 10, 180)
-    gfx.drawText("⬅️➡️: Navigate", 10, 200)
-    gfx.drawText("⬆️⬇️: Change tuning", 10, 220)
+    gfx.drawRoundRect(startX, startY, frameWidth, 70, 10)
+    gfx.setColor(gfx.kColorBlack)
+    gfx.drawText("A: Play note", startX + 10, startY + 7)
+    gfx.drawText("⬅️➡️: Navigate", startX + 10, startY + 27)
+    gfx.drawText("⬆️⬇️: Change tuning", startX + 10, startY + 47)
 end
 
 function playdate.AButtonDown()
@@ -227,8 +239,6 @@ function handleTuningChange(direction)
     elseif currentPreset < 1 then
         currentPreset = #constants.tuningVariants
     end
-
-    print(currentPreset)
 
     currentTuning = constants.tuningVariants[currentPreset].tuning
 end
