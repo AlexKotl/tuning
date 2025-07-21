@@ -74,10 +74,18 @@ function playStringNote()
     if soundPlayer then
         soundPlayer:play()
     end
+
+    -- Trigger wave animation for the selected string
+    strings[selectedString]:triggerWave()
 end
 
 function playdate.update()
     gfx.clear()
+
+    -- Update all strings for wave animation
+    for i = 1, 6 do
+        strings[i]:update()
+    end
 
     local tuningName = "Standard"
     for i, variant in ipairs(constants.tuningVariants) do
