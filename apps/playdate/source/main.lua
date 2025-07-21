@@ -114,7 +114,7 @@ function playdate.update()
         -- Draw the enhanced button
         drawRoundedButton(x, startY + 22, squareSize, squareSize, fillColor, borderColor, isSelected)
 
-        strings[i]:draw(x + 16, startY + 22 + 37)
+        strings[i]:draw(x + 18, startY + 22 + 37)
 
         -- Draw string number with better positioning
         local numberX = x + (squareSize - gfx.getTextSize(tostring(i))) / 2

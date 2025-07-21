@@ -10,9 +10,9 @@ function GuitarString:init(stringSize)
   newSelf.isWaving = false
   newSelf.waveTime = 0
   newSelf.waveAmplitude = 5
-  newSelf.waveFrequency = 0.15
-  newSelf.waveDecay = 0.95
-  newSelf.waveDuration = 30
+  newSelf.waveFrequency = 0.75
+  newSelf.waveDecay = 0.35
+  newSelf.waveDuration = 40
   newSelf.waveTimer = 0
   return newSelf
 end
