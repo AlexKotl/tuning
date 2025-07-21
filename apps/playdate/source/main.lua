@@ -1,5 +1,6 @@
 local constants = import "constants"
 local utils = import "utils"
+local GuitarString = import "components/guitar-string"
 
 local gfx = playdate.graphics
 
@@ -21,6 +22,15 @@ local selectedColor = gfx.kColorBlack
 local unselectedColor = gfx.kColorWhite
 local borderColor = gfx.kColorBlack
 local highlightColor = gfx.kColorWhite
+
+local strings = {
+    GuitarString:init(1),
+    GuitarString:init(2),
+    GuitarString:init(3),
+    GuitarString:init(4),
+    GuitarString:init(5),
+    GuitarString:init(6),
+}
 
 -- Constants for sound file naming (same as web app)
 local SOUND_FILE_INDEX_DIFF = 9
@@ -96,8 +106,7 @@ function playdate.update()
         -- Draw the enhanced button
         drawRoundedButton(x, startY + 22, squareSize, squareSize, fillColor, borderColor, isSelected)
 
-        gfx.setLineWidth(i+1)
-        gfx.drawLine(x + 16, startY + 22 + 50, x + 16, startY + 22 + 100)
+        strings[i]:draw(x + 16, startY + 22 + 37)
 
         -- Draw string number with better positioning
         local numberX = x + (squareSize - gfx.getTextSize(tostring(i))) / 2
