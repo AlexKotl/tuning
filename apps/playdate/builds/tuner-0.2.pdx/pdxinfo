@@ -1,0 +1,9 @@
+name=Guitar Tuner
+author=Slicer
+description=Guitar tuner for fingerstyle players
+bundleID=com.slicer.tuner
+version=0.1
+buildNumber=1
+imagePath=assets/launcher/card.png
+pdxversion=20601
+buildtime=806585231

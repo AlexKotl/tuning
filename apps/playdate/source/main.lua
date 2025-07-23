@@ -61,12 +61,13 @@ function gridview:drawCell(section, row, column, selected, x, y, width, height)
     end
 
     gfx.setFont(fontBigger)
+    gfx.setFontTracking(-0.5)
     gfx.setLineWidth(isCurrent and 3 or 1)
     gfx.setColor(gfx.kColorWhite)
-    gfx.fillRoundRect(x, y, width, height, cornerRadius)
+    gfx.fillRoundRect(x, y, width - 3, height - 3, cornerRadius)
 
     gfx.setColor(gfx.kColorBlack)
-    gfx.drawRoundRect(x, y, width, height, cornerRadius)
+    gfx.drawRoundRect(x, y, width - 3, height - 3, cornerRadius)
 
     gfx.setColor(gfx.kColorBlack)
     local titleX = x + (width - gfx.getTextSize(tuningVariant.title)) / 2
@@ -78,7 +79,7 @@ function gridview:drawCell(section, row, column, selected, x, y, width, height)
     end
     local notesText = table.concat(reversedTuning, "-")
     local notesX = x + (width - gfx.getTextSize(notesText)) / 2
-    gfx.drawText(notesText, notesX, y + 22)
+    gfx.drawText(notesText, notesX, y + 20)
 end
 
 -- Helper function to draw rounded rectangle with shadow
